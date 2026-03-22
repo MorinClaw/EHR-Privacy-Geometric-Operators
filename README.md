@@ -85,7 +85,7 @@ This guarantees exact mean/variance preservation (Constraint C1) and enables a u
 ├── B5_complexity_compute/          # §7 — Runtime & scaling analysis
 ├── B6_agent_ablation/              # §7 — Operator & agent ablation
 │
-├── p7_qmix_pilot/                  # §5.8 — Q-mix pilot (privacy cliff experiment)
+├── P7_qmix_pilot/                  # §5.8 — Q-mix pilot (privacy cliff experiment)
 ├── P3_weak_interpolation/          # Supporting: weak interpolation pipeline
 ├── P6_alpha_hierarchy/             # Supporting: α-hierarchy Pareto plots
 │
@@ -114,7 +114,7 @@ This guarantees exact mean/variance preservation (Constraint C1) and enables a u
 | §5.5 — Multivariate correlation | `A5_multivariate_correlation/` | `exp_a5_correlation.py` |
 | §5.6 — Temporal structure (ACF/PACF) | `A6_temporal_structure/` | `exp_a6_temporal.py` |
 | §5.7 — Privacy attacks (A-family) | `A7_privacy_attacks/` | `exp_a7_privacy.py` |
-| §5.8 — Q-mix pilot | `p7_qmix_pilot/` | `run_qmix_pilot.py` |
+| §5.8 — Q-mix pilot | `P7_qmix_pilot/` | `run_qmix_pilot.py` |
 | §6 — EHR-Privacy-Agent system | `agent_demo/` | `skills_and_agent.py` |
 | §7 — Privacy grid search | `B2_privacy_utility/` | `exp_b2_grid_search_privacy.py` |
 | §7 — End-to-end theory checks | `B3_theory_e2e/` | `exp_b3_theory_constraints.py` |
@@ -180,13 +180,13 @@ python exp_a7_privacy.py --variables HR Glucose --K 5
 
 **Q-mix pilot:**
 ```bash
-cd p7_qmix_pilot/code
+cd P7_qmix_pilot/code
 python run_qmix_pilot.py \
   --raw-ts-dir data_preparation/experiment_extracted/ts_48h \
   --variables HR Glucose \
   --alphas 1.0 2.0 3.0 \
   --secret-seed 42 \
-  --out-root p7_qmix_pilot/results
+  --out-root P7_qmix_pilot/results
 ```
 
 **End-to-end system (B4):**

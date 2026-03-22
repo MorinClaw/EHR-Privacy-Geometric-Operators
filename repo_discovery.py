@@ -2,14 +2,14 @@
 Resolve experiment layout without hard-coded non-ASCII directory names.
 
 Top-level folder names may be localized; discovery uses structural markers
-(privacy_evaluation_protocol, p7_qmix_pilot) and basename prefixes (A2_, P6_, …).
+(privacy_evaluation_protocol, P7_qmix_pilot) and basename prefixes (A2_, P6_, …).
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-_REPO_MARKERS = ("privacy_evaluation_protocol", "p7_qmix_pilot")
+_REPO_MARKERS = ("privacy_evaluation_protocol", "P7_qmix_pilot")
 
 
 def find_prefixed_section_dir(repo_root: Path, prefix: str) -> Path:
