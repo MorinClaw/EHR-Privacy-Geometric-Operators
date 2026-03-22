@@ -1,0 +1,2766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>数据隐私 Agent + Skill 工具库可视化 Demo</title>
+<style>
+  :root {
+    --bg: #050816;
+    --bg-elevated: #0b1120;
+    --card: #020617;
+    --border: #1f2937;
+    --accent: #6366f1;
+    --accent-soft: rgba(99,102,241,0.1);
+    --text-main: #e5e7eb;
+    --text-sub: #9ca3af;
+    --danger: #f97373;
+    --success: #4ade80;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top left, #1e293b 0, #020617 55%);
+    color: var(--text-main);
+  }
+
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 12px 24px;
+    border-bottom: 1px solid #111827;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.6));
+    backdrop-filter: blur(6px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  header h1 span.logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: radial-gradient(circle, #a855f7, #6366f1);
+  }
+
+  header .subtitle {
+    font-size: 13px;
+    color: var(--text-sub);
+  }
+
+  .layout {
+    display: flex;
+    flex: 1;
+    padding: 12px 16px 16px;
+    gap: 12px;
+  }
+
+  .sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .panel {
+    background: radial-gradient(circle at top left, rgba(30,64,175,0.18), rgba(15,23,42,0.9));
+    border-radius: 14px;
+    border: 1px solid rgba(55,65,81,0.7);
+    padding: 10px 14px;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.7);
+  }
+
+  .panel h2, .panel h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #9ca3ff;
+  }
+
+  .panel h3 {
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: 0.01em;
+  }
+
+  .controls-group {
+    margin-bottom: 8px;
+  }
+
+  .controls-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 4px;
+  }
+
+  select, input[type="number"] {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #1f2937;
+    background: #020617;
+    color: var(--text-main);
+    font-size: 13px;
+    outline: none;
+  }
+
+  select:focus, input[type="number"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(99,102,241,0.6);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(99,102,241,0.7);
+    background: radial-gradient(circle at top left, #4f46e5, #1d4ed8);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    margin-right: 4px;
+    margin-top: 6px;
+    transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+                background 0.12s ease-out;
+  }
+
+  .btn.secondary {
+    border-color: #374151;
+    background: #020617;
+    color: var(--text-sub);
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(79,70,229,0.5);
+  }
+
+  .btn.secondary:hover {
+    box-shadow: 0 6px 16px rgba(15,23,42,0.8);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 11px;
+    border: 1px solid rgba(148,163,184,0.5);
+    color: var(--text-sub);
+    gap: 4px;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #4ade80;
+  }
+
+  .skill-list {
+    max-height: 280px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .skill-item {
+    border-radius: 10px;
+    padding: 6px 8px;
+    background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(31,41,55,0.9);
+    margin-bottom: 6px;
+  }
+
+  .skill-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+
+  .skill-name {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .skill-id {
+    font-size: 10px;
+    color: var(--text-sub);
+  }
+
+  .skill-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .skill-tag {
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 999px;
+    border: 1px solid rgba(55,65,81,0.8);
+    background: rgba(15,23,42,0.9);
+    color: var(--text-sub);
+  }
+
+  .skill-desc {
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 4px;
+  }
+
+  .graph-panel {
+    min-height: 230px;
+  }
+
+  .graph-container {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    background: radial-gradient(circle at center, rgba(12,74,110,0.3), rgba(15,23,42,0.9));
+    border: 1px solid rgba(30,64,175,0.7);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .charts-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .charts-row,
+  .non-numeric-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .non-numeric-preview .chart-column {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .sample-table-wrap {
+    font-size: 11px;
+    overflow: auto;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 1px solid rgba(55,65,81,0.8);
+    background: rgba(15,23,42,0.95);
+    padding: 6px;
+  }
+
+  .sample-table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-main);
+  }
+
+  .sample-table-wrap th,
+  .sample-table-wrap td {
+    text-align: left;
+    padding: 4px 6px;
+    border-bottom: 1px solid rgba(55,65,81,0.6);
+  }
+
+  .sample-table-wrap th {
+    color: #9ca3ff;
+    font-weight: 600;
+  }
+
+  .sample-table-wrap td {
+    color: var(--text-sub);
+  }
+
+  .sample-table-wrap pre {
+    margin: 0;
+    font-size: 10px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--text-sub);
+  }
+
+  .chart-column {
+    flex: 1;
+    min-width: 0;
+  }
+
+  canvas {
+    width: 100%;
+    height: 160px;
+    border-radius: 10px;
+    background: radial-gradient(circle at top, rgba(15,23,42,0.95), rgba(15,23,42,1));
+    border: 1px solid rgba(31,41,55,0.9);
+  }
+
+  .stats {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .explain-panel {
+    font-size: 12px;
+  }
+
+  .dataset-doc-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .dataset-doc-subtitle {
+    margin-top: 6px;
+    font-weight: 500;
+    color: #cbd5f5;
+  }
+
+  .dataset-doc-ops ul {
+    margin: 4px 0 0;
+    padding-left: 18px;
+  }
+
+  .dataset-doc-ops li {
+    margin-bottom: 2px;
+  }
+
+  .dataset-task {
+    margin-top: 4px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(55,65,81,0.8);
+  }
+
+  .dataset-task-title {
+    font-weight: 500;
+    color: #e5e7eb;
+  }
+
+  .dataset-task-body {
+    color: var(--text-sub);
+  }
+
+  .task-panel {
+    min-height: 120px;
+  }
+
+  .task-panel #taskMetricsChart {
+    display: block;
+    margin-top: 6px;
+  }
+
+  .attack-panel .attack-report {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.5;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .attack-panel .attack-report table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0;
+  }
+
+  .attack-panel .attack-report th,
+  .attack-panel .attack-report td {
+    text-align: left;
+    padding: 3px 8px;
+    border-bottom: 1px solid rgba(55,65,81,0.5);
+  }
+
+  .attack-panel .attack-report th {
+    color: #9ca3ff;
+    font-weight: 600;
+  }
+
+  .attack-panel .attack-report .attack-ok {
+    color: var(--success);
+  }
+
+  .attack-panel .attack-report .attack-warn {
+    color: #fbbf24;
+  }
+
+  .attack-panel .attack-report .attack-note {
+    font-size: 11px;
+    color: var(--text-sub);
+    padding: 2px 8px 6px;
+    border-bottom: 1px solid rgba(55,65,81,0.4);
+  }
+
+  .log-panel {
+    max-height: 200px;
+    overflow: auto;
+    font-size: 11px;
+    background: radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(15,23,42,1));
+  }
+
+  .log-panel pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  @media (max-width: 1000px) {
+    .layout { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      flex-direction: row;
+      gap: 10px;
+    }
+    .sidebar .panel { flex: 1; }
+  }
+
+  @media (max-width: 700px) {
+    .charts-panel { flex-direction: column; }
+    .sidebar { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>
+        <span class="logo-dot"></span>
+        Privacy Agent Skill Graph
+      </h1>
+      <div class="subtitle">
+        医疗数据隐私 &nbsp;·&nbsp; Agent 选择算子流水线 &nbsp;·&nbsp; 低算力可落地
+      </div>
+    </div>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Demo only – 用于架构展示
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- 左侧：控制 + Skill 列表 -->
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>Agent 配置</h2>
+        <div class="controls-group">
+          <label for="dataType">数据视图 (dataset)</label>
+          <select id="dataType">
+            <option value="numeric">数值列（HR demo）</option>
+            <option value="patient_profile">patient_profile（人口学 / 患者概览）</option>
+            <option value="timeline">timeline_events / complete.jsonl（时间线事件）</option>
+            <option value="kg">KG prescriptions ATC（知识图谱样本）</option>
+          </select>
+        </div>
+        <div class="controls-group">
+          <label for="privacyLevel">隐私强度 (privacy_level)</label>
+          <select id="privacyLevel">
+            <option value="light">轻微 (utility 高)</option>
+            <option value="medium" selected>中等</option>
+            <option value="strong">强隐私 (扰动大)</option>
+          </select>
+        </div>
+        <div class="controls-group" id="alphaControlWrap">
+          <label for="alphaSelect">α 归一化空间阈值（仅数值列，与实验一致）</label>
+          <select id="alphaSelect">
+            <option value="0.5">0.5</option>
+            <option value="0.8" selected>0.8</option>
+            <option value="1.0">1.0</option>
+            <option value="1.2">1.2</option>
+          </select>
+          <div style="font-size:10px;color:var(--text-sub);margin-top:2px;">α 越大 = 隐私越强，重构 R² 越低；按真实尺度 ε=α·std(x)。</div>
+        </div>
+        <div class="controls-group">
+          <label for="dataSize">HR demo 样本数 n（仅数值 demo 用）</label>
+          <input type="number" id="dataSize" value="300" min="30" max="1000" step="10" />
+        </div>
+        <div class="controls-group">
+          <button class="btn secondary" id="btnResample">重新采样 HR demo</button>
+          <button class="btn" id="btnRun">让 Agent 规划并运行</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">
+          提示：<b>数值列（HR demo）</b> 会真实执行数值算子 + 医疗任务评估；<br>
+          其它数据视图展示的是对应 <code>patient_profile</code> /
+          <code>timeline_events</code> / <code>kg_example_record_prescriptions_atc.json</code>
+          的算子规划和任务说明。
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Skill 工具库</h2>
+        <div class="skill-list" id="skillList"></div>
+      </section>
+    </aside>
+
+    <!-- 右侧：图 + 图表 + 解释 + 日志 -->
+    <section class="main">
+      <section class="panel graph-panel">
+        <h2>Agent 规划的算子流水线</h2>
+        <div class="graph-container">
+          <svg id="pipelineGraph" width="100%" height="200"></svg>
+        </div>
+      </section>
+
+      <section class="panel charts-panel">
+        <div id="numericCharts" class="charts-row">
+          <div class="chart-column">
+            <h3>原始数值列分布 (Raw HR demo)</h3>
+            <canvas id="originalChart" width="400" height="160"></canvas>
+            <div class="stats" id="originalStats"></div>
+          </div>
+          <div class="chart-column">
+            <h3>变换后数值列分布 (Transformed)</h3>
+            <canvas id="transformedChart" width="400" height="160"></canvas>
+            <div class="stats" id="transformedStats"></div>
+          </div>
+        </div>
+        <div id="nonNumericPreview" class="non-numeric-preview" style="display:none;">
+          <div class="chart-column">
+            <h3>原始样例 (Raw)</h3>
+            <div id="nonNumericRaw" class="sample-table-wrap"></div>
+          </div>
+          <div class="chart-column">
+            <h3>脱敏后样例 (De-identified)</h3>
+            <div id="nonNumericDeid" class="sample-table-wrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel task-panel">
+        <h2 id="taskPanelTitle">示例医疗任务</h2>
+        <div class="stats" id="taskDescription"></div>
+        <div id="taskChartWrap">
+          <canvas id="taskMetricsChart" width="640" height="160"></canvas>
+        </div>
+        <div class="stats" id="taskMetrics" style="margin-top:6px;"></div>
+      </section>
+
+      <section class="panel explain-panel">
+        <h2>数据形态 &amp; Agent 决策解释</h2>
+        <div id="datasetDoc"></div>
+      </section>
+
+      <section class="panel attack-panel">
+        <h2>隐私攻击评估（本视图）</h2>
+        <div id="attackReport" class="attack-report"></div>
+      </section>
+
+      <section class="panel log-panel">
+        <h2>执行日志 / Execution log</h2>
+        <pre id="log"></pre>
+      </section>
+    </section>
+  </main>
+</div>
+
+<script>
+/****************************************************************
+ * 工具函数：随机数、统计量、直方图
+ ****************************************************************/
+
+// Box-Muller 高斯噪声
+let spareRand = null;
+function randn() {
+  if (spareRand !== null) {
+    const v = spareRand;
+    spareRand = null;
+    return v;
+  }
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  const mag = Math.sqrt(-2.0 * Math.log(u));
+  const z0 = mag * Math.cos(2 * Math.PI * v);
+  const z1 = mag * Math.sin(2 * Math.PI * v);
+  spareRand = z1;
+  return z0;
+}
+
+function generateSyntheticNumeric(n) {
+  const arr = [];
+  for (let i = 0; i < n; i++) {
+    // 模拟心率：N(80, 10^2)
+    arr.push(80 + 10 * randn());
+  }
+  return arr;
+}
+
+function computeStats(data, baseline) {
+  if (!data || data.length === 0) return null;
+  const n = data.length;
+  let sum = 0;
+  let sumSq = 0;
+  let min = data[0];
+  let max = data[0];
+  let maxDelta = 0;
+
+  for (let i = 0; i < n; i++) {
+    const v = data[i];
+    sum += v;
+    sumSq += v * v;
+    if (v < min) min = v;
+    if (v > max) max = v;
+    if (baseline && baseline.length === n) {
+      const d = Math.abs(v - baseline[i]);
+      if (d > maxDelta) maxDelta = d;
+    }
+  }
+  const mean = sum / n;
+  const variance = sumSq / n - mean * mean;
+  return { n, mean, variance, min, max, maxDelta: baseline ? maxDelta : null };
+}
+
+function drawHistogram(canvasId, data, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+
+  if (!data || data.length === 0) {
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "12px sans-serif";
+    ctx.fillText("当前视图非 HR demo 或无数据", 10, 20);
+    return;
+  }
+
+  const binsCount = 24;
+  let min = data[0], max = data[0];
+  for (const v of data) {
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+  if (min === max) {
+    min -= 1;
+    max += 1;
+  }
+  const binWidth = (max - min) / binsCount;
+  const bins = new Array(binsCount).fill(0);
+
+  for (const v of data) {
+    let idx = Math.floor((v - min) / binWidth);
+    if (idx < 0) idx = 0;
+    if (idx >= binsCount) idx = binsCount - 1;
+    bins[idx]++;
+  }
+
+  const maxCount = Math.max(...bins);
+  const barWidth = width / binsCount;
+  const padding = 6;
+
+  for (let i = 0; i < binsCount; i++) {
+    const c = bins[i];
+    const barHeight = maxCount > 0 ? (c / maxCount) * (height - 2 * padding) : 0;
+    const x = i * barWidth;
+    const y = height - barHeight - padding;
+    ctx.fillStyle = color;
+    ctx.fillRect(x + 1, y, barWidth - 2, barHeight);
+  }
+}
+
+// 医疗任务指标对比图：原始 vs 变换后 Acc / AUC / 1−Brier，Δ 用虚线标出
+function drawTaskMetricsChart(canvasId, evalResult) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+
+  if (!evalResult || !evalResult.raw || !evalResult.transformed) {
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "12px sans-serif";
+    ctx.fillText("无任务评估数据", 10, 20);
+    return;
+  }
+
+  const m0 = evalResult.raw;
+  const m1 = evalResult.transformed;
+  const labels = ["Acc", "AUC", "1−Brier"];
+  const rawVals = [
+    m0.acc,
+    m0.auc != null ? m0.auc : 0,
+    m0.brier != null ? 1 - m0.brier : 0
+  ];
+  const transVals = [
+    m1.acc,
+    m1.auc != null ? m1.auc : 0,
+    m1.brier != null ? 1 - m1.brier : 0
+  ];
+  const colorRaw = "#60a5fa";
+  const colorTrans = "#a855f7";
+  const padding = { top: 20, right: 12, bottom: 28, left: 36 };
+  const chartW = width - padding.left - padding.right;
+  const chartH = height - padding.top - padding.bottom;
+  const nBars = 3;
+  const groupWidth = chartW / nBars;
+  const barWidth = Math.min(28, (groupWidth - 12) / 2);
+  const maxVal = 1;
+
+  for (let i = 0; i < nBars; i++) {
+    const gx = padding.left + (i + 0.5) * groupWidth;
+    const v0 = Math.max(0, Math.min(1, rawVals[i]));
+    const v1 = Math.max(0, Math.min(1, transVals[i]));
+    const h0 = (v0 / maxVal) * chartH;
+    const h1 = (v1 / maxVal) * chartH;
+    const y0 = padding.top + chartH - h0;
+    const y1 = padding.top + chartH - h1;
+
+    ctx.fillStyle = colorRaw;
+    ctx.fillRect(gx - barWidth - 2, y0, barWidth, h0);
+    ctx.fillStyle = colorTrans;
+    ctx.fillRect(gx + 2, y1, barWidth, h1);
+
+    // Δ 变化用虚线标出（从原始柱顶到变换后柱顶）
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = "#9ca3af";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(gx - 2, y0);
+    ctx.lineTo(gx + 2, y1);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.fillStyle = "#9ca3af";
+  ctx.font = "11px sans-serif";
+  ctx.textAlign = "center";
+  for (let i = 0; i < nBars; i++) {
+    const gx = padding.left + (i + 0.5) * groupWidth;
+    ctx.fillText(labels[i], gx, height - 8);
+  }
+  ctx.textAlign = "left";
+  ctx.fillStyle = colorRaw;
+  ctx.fillRect(width - 72, 6, 10, 10);
+  ctx.fillStyle = "#e5e7eb";
+  ctx.font = "10px sans-serif";
+  ctx.fillText("原始", width - 58, 14);
+  ctx.fillStyle = colorTrans;
+  ctx.fillRect(width - 72, 22, 10, 10);
+  ctx.fillStyle = "#e5e7eb";
+  ctx.fillText("变换后", width - 58, 30);
+}
+
+/****************************************************************
+ * 数值算子实现（JS 简化版）
+ ****************************************************************/
+
+// 1) 三元组微旋转（简化版）
+function applyTripletMicroRotation(data, cfg) {
+  const maxDiff = cfg.maxDiff ?? 1.0;
+  const nPasses = cfg.nPasses ?? 3;
+  const thetaInit = cfg.thetaInit ?? 0.4;
+  const maxTrials = cfg.maxTrials ?? 20;
+
+  const x = data.slice();
+  const n = x.length;
+  const axis = [1 / Math.sqrt(3), 1 / Math.sqrt(3), 1 / Math.sqrt(3)];
+
+  function rodrigues(v, theta) {
+    const [vx, vy, vz] = v;
+    const [kx, ky, kz] = axis;
+    const cos = Math.cos(theta);
+    const sin = Math.sin(theta);
+    const cx = ky * vz - kz * vy;
+    const cy = kz * vx - kx * vz;
+    const cz = kx * vy - ky * vx;
+    const dot = kx * vx + ky * vy + kz * vz;
+    const oneMinusCos = 1 - cos;
+    return [
+      vx * cos + cx * sin + kx * dot * oneMinusCos,
+      vy * cos + cy * sin + ky * dot * oneMinusCos,
+      vz * cos + cz * sin + kz * dot * oneMinusCos
+    ];
+  }
+
+  for (let pass = 0; pass < nPasses; pass++) {
+    const idxs = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+    }
+
+    for (let start = 0; start <= n - 3; start += 3) {
+      const ids = [idxs[start], idxs[start + 1], idxs[start + 2]];
+      const v = [x[ids[0]], x[ids[1]], x[ids[2]]];
+      let thetaScale = thetaInit;
+
+      for (let t = 0; t < maxTrials; t++) {
+        const theta = (Math.random() * 2 - 1) * thetaScale;
+        const vNew = rodrigues(v, theta);
+        const deltas = [
+          vNew[0] - v[0],
+          vNew[1] - v[1],
+          vNew[2] - v[2]
+        ];
+        const maxAbs = Math.max(
+          Math.abs(deltas[0]),
+          Math.abs(deltas[1]),
+          Math.abs(deltas[2])
+        );
+        const minAbs = Math.min(
+          Math.abs(deltas[0]),
+          Math.abs(deltas[1]),
+          Math.abs(deltas[2])
+        );
+
+        if (maxAbs <= maxDiff && minAbs > 1e-5) {
+          x[ids[0]] = vNew[0];
+          x[ids[1]] = vNew[1];
+          x[ids[2]] = vNew[2];
+          break;
+        }
+
+        if (maxAbs > maxDiff) {
+          thetaScale *= 0.5;
+        } else if (minAbs <= 1e-5) {
+          thetaScale *= 1.3;
+        }
+      }
+    }
+  }
+  return x;
+}
+
+// 2) 受限噪声投影（简化版）
+function applyConstrainedNoiseProjection(data, cfg) {
+  const maxDiff = cfg.maxDiff ?? 1.0;
+  const maxAttempts = cfg.maxAttempts ?? 80;
+  const x = data.slice();
+  const n = x.length;
+
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+  const z = x.map(v => v - mean);
+  const originalNorm = Math.sqrt(z.reduce((s, v) => s + v * v, 0));
+  if (originalNorm < 1e-9) {
+    return x.slice();
+  }
+
+  let noiseScale = maxDiff * 0.5;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const noise = [];
+    for (let i = 0; i < n; i++) noise.push(randn() * noiseScale);
+
+    let zPrime = z.map((v, i) => v + noise[i]);
+    const meanPrime = zPrime.reduce((a, b) => a + b, 0) / n;
+    zPrime = zPrime.map(v => v - meanPrime);
+
+    let normPrime = Math.sqrt(zPrime.reduce((s, v) => s + v * v, 0));
+    if (normPrime < 1e-9) continue;
+
+    const scale = originalNorm / normPrime;
+    const zFinal = zPrime.map(v => v * scale);
+    const xNew = zFinal.map(v => v + mean);
+
+    let maxAbs = 0;
+    let minAbs = +Infinity;
+    for (let i = 0; i < n; i++) {
+      const d = Math.abs(xNew[i] - x[i]);
+      if (d > maxAbs) maxAbs = d;
+      if (d < minAbs) minAbs = d;
+    }
+
+    if (maxAbs <= maxDiff && minAbs > 1e-5) {
+      return xNew;
+    }
+
+    if (maxAbs > maxDiff) noiseScale *= 0.8;
+    else if (minAbs <= 1e-5) noiseScale *= 1.2;
+  }
+
+  return x;
+}
+
+// 3) Householder 反射（简化版）
+function applyHouseholderReflection(data, cfg) {
+  const maxDiff = cfg.maxDiff ?? 1.0;
+  const maxTrials = cfg.maxTrials ?? 120;
+  const x = data.slice();
+  const n = x.length;
+  const ones = new Array(n).fill(1);
+  const eps = 1e-8;
+
+  function dot(a, b) {
+    let s = 0;
+    for (let i = 0; i < a.length; i++) s += a[i] * b[i];
+    return s;
+  }
+  function norm(a) {
+    return Math.sqrt(dot(a, a));
+  }
+
+  for (let trial = 0; trial < maxTrials; trial++) {
+    const r = [];
+    for (let i = 0; i < n; i++) r.push(randn());
+    const projCoeff = dot(r, ones) / dot(ones, ones);
+    for (let i = 0; i < n; i++) {
+      r[i] = r[i] - projCoeff * ones[i];
+    }
+    const nr = norm(r);
+    if (nr < eps) continue;
+    const u = r.map(v => v / nr);
+
+    const proj = dot(u, x);
+    if (Math.abs(proj) < 1e-3) continue;
+
+    const delta = [];
+    let maxAbs = 0;
+    let minAbs = Infinity;
+    for (let i = 0; i < n; i++) {
+      const d = -2 * u[i] * proj;
+      delta.push(d);
+      const ad = Math.abs(d);
+      if (ad > maxAbs) maxAbs = ad;
+      if (ad < minAbs) minAbs = ad;
+    }
+    if (maxAbs <= maxDiff && minAbs > 1e-5) {
+      const xNew = [];
+      for (let i = 0; i < n; i++) xNew.push(x[i] + delta[i]);
+      return xNew;
+    }
+  }
+  return x;
+}
+
+/****************************************************************
+ * 示例医疗任务：生成标签 & 评估指标（基于心率 logistic 模型）
+ ****************************************************************/
+
+function sigmoid(z) {
+  return 1 / (1 + Math.exp(-z));
+}
+
+// 基于原始 HR 生成“真实标签”：y ~ Bernoulli(sigmoid((HR-80)/8))
+function generateLabelsFromNumeric(data) {
+  const labels = [];
+  for (let i = 0; i < data.length; i++) {
+    const hr = data[i];
+    const p = sigmoid((hr - 80) / 8); // HR 越高风险越大
+    const u = Math.random();
+    labels.push(u < p ? 1 : 0);
+  }
+  return labels;
+}
+
+// 朴素 O(n^2) 实现 AUC（正样本 vs 负样本两两比较）
+function computeAUC(yTrue, scores) {
+  const pos = [];
+  const neg = [];
+  for (let i = 0; i < yTrue.length; i++) {
+    if (yTrue[i] === 1) pos.push(scores[i]);
+    else if (yTrue[i] === 0) neg.push(scores[i]);
+  }
+  const P = pos.length;
+  const N = neg.length;
+  if (P === 0 || N === 0) return null;
+
+  let greater = 0;
+  let equal = 0;
+  for (let i = 0; i < P; i++) {
+    for (let j = 0; j < N; j++) {
+      if (pos[i] > neg[j]) greater++;
+      else if (pos[i] === neg[j]) equal++;
+    }
+  }
+  return (greater + 0.5 * equal) / (P * N);
+}
+
+function computeBinaryMetrics(yTrue, scores, threshold = 0.5) {
+  const n = yTrue.length;
+  let tp = 0, fp = 0, tn = 0, fn = 0;
+  let correct = 0;
+  let brier = 0;
+
+  for (let i = 0; i < n; i++) {
+    const y = yTrue[i];
+    const p = scores[i];
+    const yhat = p >= threshold ? 1 : 0;
+    if (yhat === y) correct++;
+    if (y === 1 && yhat === 1) tp++;
+    else if (y === 0 && yhat === 1) fp++;
+    else if (y === 0 && yhat === 0) tn++;
+    else if (y === 1 && yhat === 0) fn++;
+
+    const diff = p - y;
+    brier += diff * diff;
+  }
+  brier /= n;
+  const acc = correct / n;
+  const prec = (tp + fp) > 0 ? tp / (tp + fp) : 0;
+  const rec = (tp + fn) > 0 ? tp / (tp + fn) : 0;
+  const f1 = (prec + rec) > 0 ? 2 * prec * rec / (prec + rec) : 0;
+  const auc = computeAUC(yTrue, scores);
+  const posRate = (tp + fn) / n;
+
+  return { n, acc, prec, rec, f1, brier, auc, tp, fp, tn, fn, posRate };
+}
+
+// 使用同一个“心率模型”在原始 vs 变换后数据上评价
+function evaluateClinicalTask(originalData, transformedData, labels) {
+  if (!originalData || !transformedData || !labels) return null;
+  if (originalData.length === 0 ||
+      transformedData.length === 0 ||
+      labels.length === 0) return null;
+  if (originalData.length !== transformedData.length ||
+      originalData.length !== labels.length) return null;
+
+  // 模型：risk_score = sigmoid((HR-80)/8)
+  const scoresRaw = originalData.map(hr => sigmoid((hr - 80) / 8));
+  const scoresTrans = transformedData.map(hr => sigmoid((hr - 80) / 8));
+
+  const mRaw = computeBinaryMetrics(labels, scoresRaw);
+  const mTrans = computeBinaryMetrics(labels, scoresTrans);
+  return { raw: mRaw, transformed: mTrans };
+}
+
+/****************************************************************
+ * patient_profile：合成数据、脱敏模拟、任务 1/2 评估
+ ****************************************************************/
+
+function ageToBin(age) {
+  const a = Number(age);
+  if (a >= 90) return ">=90";
+  const lo = Math.floor(a / 5) * 5;
+  const hi = lo + 4;
+  return "[" + lo + "," + hi + "]";
+}
+
+function catAgg(values, keepList, minFreq, otherLabel) {
+  const keepSet = new Set(keepList || []);
+  const count = {};
+  values.forEach(v => {
+    const s = String(v);
+    count[s] = (count[s] || 0) + 1;
+  });
+  return values.map(v => {
+    const s = String(v);
+    if (keepSet.has(s) && count[s] >= minFreq) return s;
+    return otherLabel;
+  });
+}
+
+function generateSyntheticPatientProfile(n, seed) {
+  const rng = seed != null ? seededRandom(seed) : () => Math.random();
+  const ethnicities = ["WHITE", "BLACK", "ASIAN", "HISPANIC", "OTHER", "NATIVE", "UNKNOWN"];
+  const insurances = ["Medicare", "Medicaid", "Private", "Self Pay", "Government", "Unknown"];
+  const raw = [];
+  const y1y = [];
+  const y30d = [];
+  for (let i = 0; i < n; i++) {
+    const age = 18 + Math.floor(rng() * 72);
+    const gender = rng() < 0.5 ? "M" : "F";
+    const ethnicity = ethnicities[Math.floor(rng() * ethnicities.length)];
+    const insurance = insurances[Math.floor(rng() * insurances.length)];
+    raw.push({ anchor_age: age, gender, ethnicity, insurance });
+    const risk1y = (age - 50) / 30 + (insurance === "Medicare" || insurance === "Medicaid" ? 0.4 : 0) + (ethnicity === "BLACK" ? 0.2 : 0) + (rng() - 0.5);
+    const risk30d = (age - 55) / 25 + (insurance === "Self Pay" ? 0.3 : 0) + (rng() - 0.5);
+    y1y.push(rng() < sigmoid(risk1y) ? 1 : 0);
+    y30d.push(rng() < sigmoid(risk30d) ? 1 : 0);
+  }
+  const minFreq = n < 50 ? 2 : 5;
+  const keepEth = ["WHITE", "BLACK", "ASIAN"];
+  const keepIns = ["Medicare", "Medicaid", "Private", "Government"];
+  const deid = raw.map((r, i) => ({
+    anchor_age: ageToBin(r.anchor_age),
+    gender: r.gender,
+    ethnicity: catAgg(raw.map(x => x.ethnicity), keepEth, minFreq, "OTHER")[i],
+    insurance: catAgg(raw.map(x => x.insurance), keepIns, minFreq, "OTHER")[i],
+  }));
+  return { raw, deid, y_1y: y1y, y_30d: y30d };
+}
+
+function seededRandom(seed) {
+  let s = seed;
+  return function () {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    return s / 0x7fffffff;
+  };
+}
+
+function riskScoreFromProfile(rows, useBinnedAge) {
+  return rows.map(r => {
+    let age = 50;
+    if (useBinnedAge && typeof r.anchor_age === "string") {
+      const m = r.anchor_age.match(/\[(\d+),(\d+)\]/);
+      if (m) age = (parseInt(m[1], 10) + parseInt(m[2], 10)) / 2;
+      else if (String(r.anchor_age).indexOf(">=90") >= 0) age = 92;
+    } else {
+      age = Number(r.anchor_age) || 50;
+    }
+    let s = (age - 50) / 30;
+    if (r.insurance === "Medicare" || r.insurance === "Medicaid") s += 0.4;
+    if (r.ethnicity === "BLACK") s += 0.2;
+    return sigmoid(s);
+  });
+}
+
+function evaluatePatientProfileTask1(rawRows, deidRows, y1y) {
+  if (!rawRows || !deidRows || !y1y || rawRows.length !== y1y.length || deidRows.length !== y1y.length) return null;
+  const scoresRaw = riskScoreFromProfile(rawRows, false);
+  const scoresDeid = riskScoreFromProfile(deidRows, true);
+  const mRaw = computeBinaryMetrics(y1y, scoresRaw);
+  const mTrans = computeBinaryMetrics(y1y, scoresDeid);
+  return { raw: mRaw, transformed: mTrans };
+}
+
+function wilsonCi(n, p, z) {
+  z = z || 1.96;
+  if (n === 0) return [0, 0];
+  const den = 1 + (z * z) / n;
+  const center = (p + (z * z) / (2 * n)) / den;
+  const spread = (z / den) * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n));
+  return [Math.max(0, center - spread), Math.min(1, center + spread)];
+}
+
+function stratifiedRates(rows, groupCol, eventCol) {
+  const groups = {};
+  rows.forEach((r, i) => {
+    const g = String(r[groupCol] || "?");
+    if (!groups[g]) groups[g] = { n: 0, events: 0 };
+    groups[g].n++;
+    if (Number(r[eventCol]) === 1) groups[g].events++;
+  });
+  return Object.keys(groups).sort().map(g => {
+    const n = groups[g].n;
+    const ev = groups[g].events;
+    const rate = n ? ev / n : 0;
+    const [ciLow, ciHigh] = wilsonCi(n, rate);
+    return { group: g, n, events: ev, rate, ci_low: ciLow, ci_high: ciHigh };
+  });
+}
+
+/****************************************************************
+ * timeline_events：合成时间线、相对时间脱敏、任务 1/2 评估
+ ****************************************************************/
+
+function generateSyntheticTimeline(nPatients, seed) {
+  const rng = seed != null ? seededRandom(seed) : () => Math.random();
+  const events = [];
+  const baseDate = new Date("2148-06-01T00:00:00").getTime();
+  const dayMs = 24 * 60 * 60 * 1000;
+  for (let p = 0; p < nPatients; p++) {
+    const sid = "1" + String(100000 + p).slice(-5);
+    const nEv = 4 + Math.floor(rng() * 4);
+    let t0 = null;
+    for (let e = 0; e < nEv; e++) {
+      const dayOffset = e === 0 ? 0 : 0.5 + rng() * 4;
+      const t = baseDate + dayOffset * dayMs + (e * 2 + rng() * 3) * 60 * 60 * 1000;
+      if (t0 == null) t0 = t;
+      const valuenum = Math.round(70 + rng() * 80 + (e > 1 ? 20 : 0));
+      const d = new Date(t);
+      const charttime = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0") + " " + String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+      events.push({
+        subject_id: sid,
+        charttime: charttime,
+        charttimeMs: t,
+        t0: t0,
+        valuenum: valuenum,
+        text: "Event " + (e + 1) + ", value " + valuenum
+      });
+    }
+  }
+  return events;
+}
+
+function applyTimelineDeid(events) {
+  const bySubj = {};
+  events.forEach(ev => {
+    const s = ev.subject_id;
+    if (!bySubj[s]) bySubj[s] = [];
+    bySubj[s].push({ ...ev });
+  });
+  const pseudo = {};
+  let pid = 0;
+  const out = [];
+  Object.keys(bySubj).sort().forEach(sid => {
+    if (!pseudo[sid]) pseudo[sid] = "pid_" + (++pid) + "_" + sid.slice(-4);
+    const list = bySubj[sid];
+    list.sort((a, b) => a.charttimeMs - b.charttimeMs);
+    const t0 = list[0].charttimeMs;
+    const dayMs = 24 * 60 * 60 * 1000;
+    list.forEach((ev, i) => {
+      const day = Math.floor((ev.charttimeMs - t0) / dayMs);
+      out.push({
+        subject_id: pseudo[sid],
+        charttime: "day " + day,
+        valuenum: ev.valuenum,
+        text: ev.text,
+        _day: day,
+        _t0: t0
+      });
+    });
+  });
+  return out;
+}
+
+function evaluateTimelineTask1(rawEvents, deidEvents, labels) {
+  const getFirst24hMean = (evList, bySubj) => {
+    const perSubj = {};
+    evList.forEach(ev => {
+      const s = ev.subject_id;
+      const day = ev._day != null ? ev._day : (bySubj ? Math.floor((ev.charttimeMs - ev.t0) / (24*60*60*1000)) : 0);
+      if (day !== 0) return;
+      if (!perSubj[s]) perSubj[s] = [];
+      perSubj[s].push(ev.valuenum != null ? ev.valuenum : 80);
+    });
+    return Object.keys(perSubj).sort().map(s => {
+      const arr = perSubj[s];
+      return arr.reduce((a, b) => a + b, 0) / arr.length;
+    });
+  };
+  const bySubjRaw = {};
+  rawEvents.forEach(ev => {
+    if (!bySubjRaw[ev.subject_id]) bySubjRaw[ev.subject_id] = [];
+    bySubjRaw[ev.subject_id].push(ev);
+  });
+  rawEvents.forEach(ev => {
+    ev._day = Math.floor((ev.charttimeMs - ev.t0) / (24*60*60*1000));
+  });
+  const meansRaw = getFirst24hMean(rawEvents, false);
+  const meansDeid = [];
+  const deidBySubj = {};
+  const deidSubjOrder = [];
+  deidEvents.forEach(ev => {
+    if (!deidBySubj[ev.subject_id]) {
+      deidBySubj[ev.subject_id] = [];
+      deidSubjOrder.push(ev.subject_id);
+    }
+    deidBySubj[ev.subject_id].push(ev);
+  });
+  deidSubjOrder.forEach(s => {
+    const arr = deidBySubj[s].filter(e => e._day === 0).map(e => e.valuenum);
+    if (arr.length) meansDeid.push(arr.reduce((a, b) => a + b, 0) / arr.length);
+  });
+  const n = Math.min(meansRaw.length, meansDeid.length, labels.length);
+  if (n < 10) return null;
+  const y = labels.slice(0, n);
+  const scoresRaw = meansRaw.slice(0, n).map(v => sigmoid((v - 90) / 25));
+  const scoresDeid = meansDeid.slice(0, n).map(v => sigmoid((v - 90) / 25));
+  const mRaw = computeBinaryMetrics(y, scoresRaw);
+  const mTrans = computeBinaryMetrics(y, scoresDeid);
+  return { raw: mRaw, transformed: mTrans };
+}
+
+function evaluateTimelineTask2(rawEvents, deidEvents) {
+  const rateInDay12 = (evList) => {
+    const bySubj = {};
+    evList.forEach(ev => {
+      const s = ev.subject_id;
+      const day = ev._day != null ? ev._day : (ev.charttime && ev.charttime.indexOf("day") === 0 ? parseInt(ev.charttime.replace("day ",""), 10) : 0);
+      if (day < 1 || day > 2) return;
+      if (!bySubj[s]) bySubj[s] = [];
+      bySubj[s].push(ev.valuenum != null ? ev.valuenum : 80);
+    });
+    let highCount = 0;
+    let total = 0;
+    Object.keys(bySubj).forEach(s => {
+      total++;
+      const vals = bySubj[s];
+      const maxV = Math.max.apply(null, vals);
+      if (maxV >= 120) highCount++;
+    });
+    return total ? highCount / total : 0;
+  };
+  rawEvents.forEach(ev => {
+    if (ev._day == null) ev._day = Math.floor((ev.charttimeMs - ev.t0) / (24*60*60*1000));
+  });
+  const rateRaw = rateInDay12(rawEvents);
+  const rateDeid = rateInDay12(deidEvents);
+  const nPatients = new Set(deidEvents.map(e => e.subject_id)).size;
+  return { rateRaw, rateDeid, nPatients };
+}
+
+/****************************************************************
+ * KG：合成处方图、脱敏、任务 1 共现 / 任务 2 Laplace 聚合
+ ****************************************************************/
+
+function generateSyntheticKG(nEdges, seed) {
+  const rng = seed != null ? seededRandom(seed) : () => Math.random();
+  const drugs = [
+    { atc: "A10BA02", name: "Metformin" },
+    { atc: "B01AC06", name: "Aspirin" },
+    { atc: "C09CA01", name: "Losartan" },
+    { atc: "N05AH03", name: "Quetiapine" },
+    { atc: "L04AX03", name: "Methotrexate" }
+  ];
+  const edges = [];
+  const nSubj = Math.max(3, Math.floor(nEdges / 4));
+  for (let i = 0; i < nEdges; i++) {
+    const sid = "1" + String(100000 + (i % nSubj)).slice(-5);
+    const d = drugs[Math.floor(rng() * drugs.length)];
+    const dayOffset = Math.floor(rng() * 30);
+    const period_begin = "2148-" + String(1 + (dayOffset % 12)).padStart(2, "0") + "-" + String(1 + (dayOffset % 28)).padStart(2, "0");
+    edges.push({ subject_id: sid, atc_code: d.atc, drug_name: d.name, period_begin });
+  }
+  return edges;
+}
+
+function applyKGDeid(edges) {
+  const pseudo = {};
+  let pid = 0;
+  const bySubj = {};
+  edges.forEach(ev => {
+    const s = ev.subject_id;
+    if (!pseudo[s]) pseudo[s] = "kg_" + (++pid);
+    if (!bySubj[ev.subject_id]) bySubj[ev.subject_id] = [];
+    bySubj[ev.subject_id].push(ev);
+  });
+  const out = [];
+  let w = 0;
+  Object.keys(bySubj).sort().forEach(sid => {
+    const list = bySubj[sid];
+    list.sort((a, b) => (a.period_begin || "").localeCompare(b.period_begin || ""));
+    list.forEach((ev, i) => {
+      out.push({
+        subject_id: pseudo[sid],
+        atc_code: ev.atc_code,
+        drug_name: ev.drug_name,
+        period_begin: "window_" + (i + 1)
+      });
+    });
+  });
+  return out;
+}
+
+function evaluateKGTask1(rawEdges, deidEdges) {
+  const getTopPairs = (edgeList) => {
+    const bySubj = {};
+    edgeList.forEach(e => {
+      const s = e.subject_id;
+      if (!bySubj[s]) bySubj[s] = new Set();
+      bySubj[s].add(e.drug_name);
+    });
+    const pairCount = {};
+    Object.keys(bySubj).forEach(s => {
+      const drugs = Array.from(bySubj[s]);
+      for (let i = 0; i < drugs.length; i++)
+        for (let j = i + 1; j < drugs.length; j++) {
+          const key = [drugs[i], drugs[j]].sort().join(" + ");
+          pairCount[key] = (pairCount[key] || 0) + 1;
+        }
+    });
+    return Object.keys(pairCount).map(k => ({ pair: k, count: pairCount[k] })).sort((a, b) => b.count - a.count).slice(0, 5);
+  };
+  const rawPairs = getTopPairs(rawEdges);
+  const deidPairs = getTopPairs(deidEdges);
+  return { raw: rawPairs, deid: deidPairs };
+}
+
+function evaluateKGTask2(edges, eps) {
+  eps = eps || 0.5;
+  const countByDrug = {};
+  edges.forEach(e => {
+    const d = e.drug_name || e.atc_code;
+    countByDrug[d] = (countByDrug[d] || 0) + 1;
+  });
+  const lapNoise = () => {
+    const u = Math.random() - 0.5;
+    return u > 0 ? -Math.log(1 - 2 * u) / eps : Math.log(1 + 2 * u) / eps;
+  };
+  return Object.keys(countByDrug).sort().map(d => ({
+    drug: d,
+    rawCount: countByDrug[d],
+    noisyCount: Math.round(countByDrug[d] + lapNoise())
+  }));
+}
+
+/****************************************************************
+ * Skill 库（补齐所有算子，用于展示）
+ ****************************************************************/
+
+const SKILL_LIBRARY = {
+  // 数值型 3 个主算子
+  "num_triplet": {
+    id: "num_triplet",
+    name: "三元组微旋转 (T1)",
+    target: "numeric",
+    description: "局部旋转保持均值/方差，归一化空间 |Δ|≤α。",
+    complexity: "O(N)",
+    guarantees: ["mean", "variance", "l_inf<=α·std", "non-invertible"],
+    apply: applyTripletMicroRotation,
+    defaultConfig: { maxDiff: 0.8, nPasses: 3 }
+  },
+  "num_noise_proj": {
+    id: "num_noise_proj",
+    name: "受限噪声投影 (T2)",
+    target: "numeric",
+    description: "加高斯噪声后投影回球–平面交集，扰动≤α·std。",
+    complexity: "O(N)",
+    guarantees: ["mean", "variance", "l_inf<=α·std", "non-invertible"],
+    apply: applyConstrainedNoiseProjection,
+    defaultConfig: { maxDiff: 0.8 }
+  },
+  "num_householder": {
+    id: "num_householder",
+    name: "Householder 反射 (T3)",
+    target: "numeric",
+    description: "高维镜面反射，保持均值/方差，扰动≤α·std。",
+    complexity: "O(N)",
+    guarantees: ["mean", "variance", "l_inf<=α·std"],
+    apply: applyHouseholderReflection,
+    defaultConfig: { maxDiff: 0.8 }
+  },
+
+  // IDs & 人口学
+  "id_hash": {
+    id: "id_hash",
+    name: "ID 哈希伪匿名 (T_ID-hash)",
+    target: "id",
+    description: "所有 *_id 字段做不可逆哈希映射或伪 ID 替换。",
+    complexity: "O(N)",
+    guarantees: ["non-invertible"],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "demo_bin": {
+    id: "demo_bin",
+    name: "人口学粗分箱 (T_demo-bin)",
+    target: "id",
+    description: "年龄、年份等连续人口学变量做粗分箱。",
+    complexity: "O(N)",
+    guarantees: [],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "microagg": {
+    id: "microagg",
+    name: "Micro-aggregation (T_micro)",
+    target: "id",
+    description: "基于 k-匿名的微聚合，在等价类内取均值/众数。",
+    complexity: "O(N log N)",
+    guarantees: ["k-anonymity"],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "cat_agg": {
+    id: "cat_agg",
+    name: "稀有类别合并 / 上卷 (T_cat-agg)",
+    target: "id",
+    description: "将低频类别合并为 OTHER 或上卷到更粗层级。",
+    complexity: "O(N)",
+    guarantees: [],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+
+  // 时间 & 临床事件
+  "time_rel": {
+    id: "time_rel",
+    name: "相对时间编码 (T_time-rel)",
+    target: "time",
+    description: "绝对时间戳 → 相对 index time（如首入院）的天/小时。",
+    complexity: "O(N)",
+    guarantees: [],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "time_shift": {
+    id: "time_shift",
+    name: "时间随机平移 + 粗化 (T_time-shift)",
+    target: "time",
+    description: "按患者整体平移时间线并降粒度到天/时段。",
+    complexity: "O(N)",
+    guarantees: [],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "ds_tab": {
+    id: "ds_tab",
+    name: "表格部分合成 (T_DS-tab)",
+    target: "clinical",
+    description: "对少量敏感实验/用药变量做 DataSifter 风格部分合成。",
+    complexity: "O(N · iter)",
+    guarantees: ["non-invertible"],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+
+  // 文本
+  "text_mask": {
+    id: "text_mask",
+    name: "强规则掩码 (T_mask)",
+    target: "text",
+    description: "正则掩码手机号、身份证号、地址等显性 PHI。",
+    complexity: "O(N)",
+    guarantees: [],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "text_phi_surr": {
+    id: "text_phi_surr",
+    name: "PHI 替身替换 (T_PHI-sur)",
+    target: "text",
+    description: "用小模型识别人名机构等 PHI，并替换为逼真 surrogate。",
+    complexity: "O(N)",
+    guarantees: ["non-invertible"],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "ds_text": {
+    id: "ds_text",
+    name: "文本部分合成 (T_DS-text)",
+    target: "text",
+    description: "随机 mask 片段并用轻量 MLM 重写，生成近似但非真实文本。",
+    complexity: "O(N · iter)",
+    guarantees: ["non-invertible"],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+
+  // KG & 聚合
+  "kg_struct": {
+    id: "kg_struct",
+    name: "KG 结构规范化 (T_KG-struct)",
+    target: "kg",
+    description: "解析并保留 ATC/UMLS 节点与关系，切断对 patient_id 的可见链接。",
+    complexity: "O(|V|+|E|)",
+    guarantees: [],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  },
+  "lap_agg": {
+    id: "lap_agg",
+    name: "差分隐私聚合 (T_Lap-agg)",
+    target: "agg",
+    description: "对聚合表计数添加 Laplace 噪声，满足 ε-DP。",
+    complexity: "O(M)",
+    guarantees: ["ε-DP"],
+    apply: (x) => x.slice ? x.slice() : x,
+    defaultConfig: {}
+  }
+};
+
+/****************************************************************
+ * 非数值视图：原始 vs 脱敏后样例（用于前端展示）
+ ****************************************************************/
+
+const SAMPLES_NON_NUMERIC = {
+  patient_profile: {
+    raw: [
+      { subject_id: "100001", anchor_age: "67", gender: "M", ethnicity: "WHITE", insurance: "Medicare" },
+      { subject_id: "100002", anchor_age: "54", gender: "F", ethnicity: "BLACK", insurance: "Medicaid" },
+      { subject_id: "100003", anchor_age: "83", gender: "M", ethnicity: "ASIAN", insurance: "Private" },
+      { subject_id: "100004", anchor_age: "41", gender: "F", ethnicity: "WHITE", insurance: "Government" },
+      { subject_id: "100005", anchor_age: "72", gender: "M", ethnicity: "WHITE", insurance: "Medicare" },
+      { subject_id: "100006", anchor_age: "38", gender: "F", ethnicity: "BLACK", insurance: "Medicaid" },
+      { subject_id: "100007", anchor_age: "59", gender: "M", ethnicity: "ASIAN", insurance: "Private" },
+      { subject_id: "100008", anchor_age: "76", gender: "F", ethnicity: "WHITE", insurance: "Medicare" },
+      { subject_id: "100009", anchor_age: "45", gender: "M", ethnicity: "HISPANIC", insurance: "Self Pay" },
+      { subject_id: "100010", anchor_age: "62", gender: "F", ethnicity: "WHITE", insurance: "Private" },
+      { subject_id: "100011", anchor_age: "51", gender: "M", ethnicity: "BLACK", insurance: "Medicaid" },
+      { subject_id: "100012", anchor_age: "69", gender: "F", ethnicity: "ASIAN", insurance: "Medicare" },
+      { subject_id: "100013", anchor_age: "33", gender: "M", ethnicity: "WHITE", insurance: "Private" },
+      { subject_id: "100014", anchor_age: "58", gender: "F", ethnicity: "BLACK", insurance: "Government" }
+    ],
+    deid: [
+      { subject_id: "20a7f83d…", anchor_age: "[65,69]", gender: "M", ethnicity: "WHITE", insurance: "Medicare" },
+      { subject_id: "373d4bc6…", anchor_age: "[50,54]", gender: "F", ethnicity: "BLACK", insurance: "Medicaid" },
+      { subject_id: "2c66cad6…", anchor_age: "[80,84]", gender: "M", ethnicity: "ASIAN", insurance: "Private" },
+      { subject_id: "d9b8002f…", anchor_age: "[40,44]", gender: "F", ethnicity: "WHITE", insurance: "Government" },
+      { subject_id: "7eec67ba…", anchor_age: "[70,74]", gender: "M", ethnicity: "WHITE", insurance: "Medicare" },
+      { subject_id: "f56fc909…", anchor_age: "[35,39]", gender: "F", ethnicity: "BLACK", insurance: "Medicaid" },
+      { subject_id: "c897c861…", anchor_age: "[55,59]", gender: "M", ethnicity: "ASIAN", insurance: "Private" },
+      { subject_id: "70247294…", anchor_age: "[75,79]", gender: "F", ethnicity: "WHITE", insurance: "Medicare" },
+      { subject_id: "5013200f…", anchor_age: "[45,49]", gender: "M", ethnicity: "OTHER", insurance: "OTHER" },
+      { subject_id: "2c6c99a8…", anchor_age: "[60,64]", gender: "F", ethnicity: "WHITE", insurance: "Private" },
+      { subject_id: "a1b2c3d4…", anchor_age: "[50,54]", gender: "M", ethnicity: "BLACK", insurance: "Medicaid" },
+      { subject_id: "e5f6g7h8…", anchor_age: "[65,69]", gender: "F", ethnicity: "ASIAN", insurance: "Medicare" },
+      { subject_id: "9i0j1k2l…", anchor_age: "[30,34]", gender: "M", ethnicity: "WHITE", insurance: "Private" },
+      { subject_id: "3m4n5o6p…", anchor_age: "[55,59]", gender: "F", ethnicity: "BLACK", insurance: "Government" }
+    ]
+  },
+  timeline: {
+    raw: [
+      { subject_id: "100001", charttime: "2148-04-21 13:45", text: "John Smith reports chest pain and mild cough." },
+      { subject_id: "100001", charttime: "2148-04-21 20:10", text: "Seen by doctor at 8:00 pm, email john.smith@…" },
+      { subject_id: "100001", charttime: "2148-04-22 08:00", text: "Glucose 120 mg/dL, BUN 18." },
+      { subject_id: "100002", charttime: "2149-01-02 09:15", text: "Mary Johnson has fever, called 555-123-4567." },
+      { subject_id: "100002", charttime: "2149-01-02 14:30", text: "Patient improved after antipyretics. Discharge planned tomorrow." },
+      { subject_id: "100003", charttime: "2149-03-05 11:30", text: "Patient lives in Boston, ID 123456789, admitted on 03/05/2149." },
+      { subject_id: "100004", charttime: "2149-05-10 10:00", text: "Elective procedure. Contact: jane.doe@hospital.org." },
+      { subject_id: "100005", charttime: "2148-08-15 07:45", text: "Robert Brown, post-op day 1. Vital signs stable." },
+      { subject_id: "100006", charttime: "2149-02-20 12:00", text: "Potassium 5.1, Na 138. Follow up in clinic." }
+    ],
+    deid: [
+      { subject_id: "20a7f83d…", charttime: "day 0, 13:45", text: "Avery Nguyen reports chest pain and mild cough." },
+      { subject_id: "20a7f83d…", charttime: "day 0, 20:10", text: "Seen by doctor at 8:00 pm, email [EMAIL]." },
+      { subject_id: "20a7f83d…", charttime: "day 0, 08:00", text: "Glucose 120 mg/dL, BUN 18." },
+      { subject_id: "373d4bc6…", charttime: "day 1, 09:15", text: "Jamie Lee has fever, called [PHONE]." },
+      { subject_id: "373d4bc6…", charttime: "day 1, 14:30", text: "Patient improved after antipyretics. Discharge planned tomorrow." },
+      { subject_id: "2c66cad6…", charttime: "day 1, 11:30", text: "Patient lives in Boston, ID [ID], admitted on [DATE]." },
+      { subject_id: "d9b8002f…", charttime: "day 2, 10:00", text: "Elective procedure. Contact: [EMAIL]." },
+      { subject_id: "7eec67ba…", charttime: "day 0, 07:45", text: "Jordan Brown, post-op day 1. Vital signs stable." },
+      { subject_id: "f56fc909…", charttime: "day 1, 12:00", text: "Potassium 5.1, Na 138. Follow up in clinic." }
+    ]
+  },
+  kg: {
+    raw: [
+      { subject_id: "100001", atc_code: "N05AH03", drug_name: "Quetiapine", period_begin: "2148-01-01" },
+      { subject_id: "100001", atc_code: "A10BA02", drug_name: "Metformin", period_begin: "2148-01-15" },
+      { subject_id: "100002", atc_code: "C09CA01", drug_name: "Losartan", period_begin: "2148-02-01" },
+      { subject_id: "100003", atc_code: "B01AC06", drug_name: "Aspirin", period_begin: "2148-03-01" }
+    ],
+    deid: [
+      { subject_id: "a1b2c3d4…", atc_code: "N05AH03", drug_name: "Quetiapine", period_begin: "window_1" },
+      { subject_id: "a1b2c3d4…", atc_code: "A10BA02", drug_name: "Metformin", period_begin: "window_2" },
+      { subject_id: "e5f6g7h8…", atc_code: "C09CA01", drug_name: "Losartan", period_begin: "window_1" },
+      { subject_id: "e5f6g7h8…", atc_code: "B01AC06", drug_name: "Aspirin", period_begin: "window_2" }
+    ]
+  }
+};
+
+/****************************************************************
+ * 隐私攻击评估（与 demo_privacy_attacks_synthetic.py 对应，每视图一次）
+ ****************************************************************/
+
+const PHI_PATTERNS = [
+  { name: "email", re: /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g },
+  { name: "phone", re: /\b\d{3}[- ]?\d{3}[- ]?\d{4}\b/g },
+  { name: "date_yyyy_mm_dd", re: /\b\d{4}-\d{2}-\d{2}\b/g },
+  { name: "url", re: /https?:\/\/\S+/g },
+  { name: "long_number(>=8)", re: /\b\d{8,}\b/g }
+];
+
+const PHI_KEYWORDS = [
+  "John Smith", "Mary Johnson", "Alex Lee", "Alex Li", "Jordan Brown", "Chris Brown",
+  "Dr. Miller", "Dr. Adams", "Dr. Wang", "Dr. Garcia",
+  "MGH", "BWH", "Stanford Hospital", "NYU Langone"
+];
+
+function countPattern(text, regex) {
+  const copy = new RegExp(regex.source, "g");
+  let n = 0;
+  let m;
+  while ((m = copy.exec(text)) !== null) n++;
+  return n;
+}
+
+function countSubstring(text, sub) {
+  let n = 0;
+  let i = 0;
+  while ((i = text.indexOf(sub, i)) !== -1) { n++; i += sub.length; }
+  return n;
+}
+
+function evaluateNumericReconstruction(rawArr, deidArr) {
+  if (!rawArr || !deidArr || rawArr.length !== deidArr.length) return null;
+  const n = rawArr.length;
+  if (n === 0) return null;
+  let mae = 0, rmse = 0, sumO = 0, sumD = 0, sumO2 = 0, sumD2 = 0, sumOD = 0, exact = 0;
+  for (let i = 0; i < n; i++) {
+    const o = rawArr[i];
+    const d = deidArr[i];
+    const diff = o - d;
+    mae += Math.abs(diff);
+    rmse += diff * diff;
+    sumO += o; sumD += d; sumO2 += o * o; sumD2 += d * d; sumOD += o * d;
+    if (Math.abs(o - d) < 1e-8) exact++;
+  }
+  mae /= n;
+  rmse = Math.sqrt(rmse / n);
+  const pearson = (n * sumOD - sumO * sumD) / (Math.sqrt(Math.max(0, n * sumO2 - sumO * sumO)) * Math.sqrt(Math.max(0, n * sumD2 - sumD * sumD)));
+  return { n, mae, rmse, pearson: Number.isFinite(pearson) ? pearson : 0, exactRatio: exact / n };
+}
+
+function renderAttackReport(dataType, history, originalNumeric, sampleRaw, sampleDeid) {
+  const el = document.getElementById("attackReport");
+  if (!el) return;
+
+  if (dataType === "numeric") {
+    const transformed = history && history.length > 0 ? history[history.length - 1].data : null;
+    if (!originalNumeric || !transformed) {
+      el.innerHTML = "<span style='color:#6b7280'>请先点击「让 Agent 规划并运行」生成数值列与脱敏结果。</span>";
+      return;
+    }
+    const r = evaluateNumericReconstruction(originalNumeric, transformed);
+    if (!r) {
+      el.innerHTML = "<span style='color:#6b7280'>无法比对（样本数不一致）。</span>";
+      return;
+    }
+    const fmt = (v) => (v == null || Number.isNaN(v) ? "-" : Number(v).toFixed(4));
+    el.innerHTML =
+      "<div><b>数值重构攻击（HR 列）</b></div>" +
+      "<table>" +
+      "<tr><th>指标</th><th>值</th></tr>" +
+      "<tr><td>样本数</td><td>" + r.n + "</td></tr>" +
+      "<tr><td colspan='2' class='attack-note'>参与比对的原始/脱敏样本条数。</td></tr>" +
+      "<tr><td>MAE</td><td>" + fmt(r.mae) + "</td></tr>" +
+      "<tr><td colspan='2' class='attack-note'>平均绝对误差；越小表示脱敏值越接近原始，越大表示扰动越强、难以精确还原。</td></tr>" +
+      "<tr><td>RMSE</td><td>" + fmt(r.rmse) + "</td></tr>" +
+      "<tr><td colspan='2' class='attack-note'>均方根误差；对大偏差更敏感，用于衡量还原误差的幅度。</td></tr>" +
+      "<tr><td>Pearson 相关系数</td><td>" + fmt(r.pearson) + "</td></tr>" +
+      "<tr><td colspan='2' class='attack-note'>原始与脱敏列的线性相关；接近 1 表示分布形状保留好，利于下游建模。</td></tr>" +
+      "<tr><td>完全相等比例</td><td>" + (r.exactRatio * 100).toFixed(2) + "%</td></tr>" +
+      "<tr><td colspan='2' class='attack-note'>脱敏后与原始值完全相等的样本占比；越低说明单条精确还原越难。</td></tr>" +
+      "</table>" +
+      "<div class='attack-ok' style='margin-top:6px'><b>当前 α = " + getCurrentAlpha() + "</b>（与实验一致，按真实尺度 ε=α·std 浮动）。α 越大 → 隐私越强、重构 R² 越低；可在上方「α 归一化空间阈值」中调节并重新运行查看效果。</div>" +
+      "<div class='attack-ok'>完全相等比例低 → 精确还原难度大；相关系数高 → 分布形状保留，利于下游建模。</div>";
+    return;
+  }
+
+  if (dataType === "patient_profile") {
+    el.innerHTML =
+      "<div><b>本视图（patient_profile）</b></div>" +
+      "<div>subject_id 已哈希；anchor_age 已分箱；bmi 微聚合；类别列已 cat_agg。无数值列做「精确还原」评估，脱敏后个体难以与原始一一对应。</div>";
+    return;
+  }
+
+  if (dataType === "timeline") {
+    const raw = sampleRaw || [];
+    const deid = sampleDeid || [];
+    const textCol = "text";
+    const getText = (rows) => rows.map(r => (r && r[textCol]) ? String(r[textCol]) : "").join("\n");
+    const rawText = getText(raw);
+    const deidText = getText(deid);
+
+    let html = "<div><b>文本 PHI 扫描攻击（列: text）</b></div>" +
+      "<div class='attack-note' style='margin-bottom:6px'>用正则与关键字在脱敏前后文本中计数，脱敏后命中越少说明 PHI 清除越彻底。</div>" +
+      "<table><tr><th>模式/关键字</th><th>脱敏前</th><th>脱敏后</th></tr>";
+    PHI_PATTERNS.forEach(({ name, re }) => {
+      const c0 = countPattern(rawText, re);
+      const c1 = countPattern(deidText, re);
+      html += "<tr><td>" + name + "</td><td>" + c0 + "</td><td>" + c1 + "</td></tr>";
+    });
+    PHI_KEYWORDS.forEach(kw => {
+      const c0 = countSubstring(rawText, kw);
+      const c1 = countSubstring(deidText, kw);
+      if (c0 === 0 && c1 === 0) return;
+      html += "<tr><td>\"" + kw + "\"</td><td>" + c0 + "</td><td>" + c1 + (c1 === 0 && c0 > 0 ? " <span class='attack-ok'>已去标识</span>" : "") + "</td></tr>";
+    });
+    html += "</table>" +
+      "<div class='attack-note' style='margin-top:6px'>" +
+      "<b>模式说明：</b> email=邮箱，phone=电话，date=日期，url=链接，long_number=长数字(≥8位)。" +
+      " 关键字为 synthetic 中注入的姓名/机构，脱敏后应被替换或移除。</div>" +
+      "<div class='attack-ok'>脱敏后 PHI 模式命中为 0、原姓名/机构消失 → 显性 PHI 已清除。</div>";
+    el.innerHTML = html;
+    return;
+  }
+
+  if (dataType === "kg") {
+    el.innerHTML =
+      "<div><b>本视图（KG）</b></div>" +
+      "<div>图为 ATC/药物结构，subject_id 与时间已脱敏为伪 ID / 相对窗口。无自由文本列，不做 PHI 扫描；节点与边不包含个人标识。</div>";
+    return;
+  }
+
+  el.innerHTML = "<span style='color:#6b7280'>当前视图暂无攻击评估。</span>";
+}
+
+function renderNonNumericSample(dataType) {
+  const rawEl = document.getElementById("nonNumericRaw");
+  const deidEl = document.getElementById("nonNumericDeid");
+  if (!rawEl || !deidEl) return;
+
+  const sample = SAMPLES_NON_NUMERIC[dataType];
+  if (!sample || !sample.raw || !sample.deid) {
+    rawEl.innerHTML = "<span style='color:#6b7280'>暂无该视图样例数据</span>";
+    deidEl.innerHTML = "";
+    return;
+  }
+
+  function toTable(rows) {
+    const keys = Object.keys(rows[0]);
+    let html = "<table><thead><tr>";
+    keys.forEach(k => { html += "<th>" + k + "</th>"; });
+    html += "</tr></thead><tbody>";
+    rows.forEach(r => {
+      html += "<tr>";
+      keys.forEach(k => { html += "<td>" + (r[k] || "").toString().replace(/</g, "&lt;") + "</td>"; });
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    return html;
+  }
+
+  rawEl.innerHTML = toTable(sample.raw);
+  deidEl.innerHTML = toTable(sample.deid);
+}
+
+/****************************************************************
+ * Agent 规划逻辑（dataset 级别）
+ ****************************************************************/
+
+function planPipeline(dataType, privacyLevel) {
+  // 1) HR 数值 demo：只看 numeric 列
+  if (dataType === "numeric") {
+    if (privacyLevel === "light") {
+      return ["num_triplet"];
+    } else if (privacyLevel === "medium") {
+      return ["num_triplet", "num_noise_proj"];
+    } else if (privacyLevel === "strong") {
+      return ["num_triplet", "num_noise_proj", "num_householder"];
+    }
+  }
+
+  // 2) patient_profile（人口学 / 概览）
+  if (dataType === "patient_profile") {
+    if (privacyLevel === "light") {
+      return ["id_hash", "demo_bin"];
+    } else if (privacyLevel === "medium") {
+      return ["id_hash", "demo_bin", "cat_agg"];
+    } else if (privacyLevel === "strong") {
+      return ["id_hash", "demo_bin", "microagg", "cat_agg"];
+    }
+  }
+
+  // 3) timeline_events / complete.jsonl（事件级时间线）
+  if (dataType === "timeline") {
+    if (privacyLevel === "light") {
+      return ["id_hash", "time_rel"];
+    } else if (privacyLevel === "medium") {
+      return ["id_hash", "time_rel", "time_shift", "text_mask", "text_phi_surr"];
+    } else if (privacyLevel === "strong") {
+      return ["id_hash", "time_rel", "time_shift", "text_mask", "text_phi_surr", "ds_tab"];
+    }
+  }
+
+  // 4) KG prescriptions ATC
+  if (dataType === "kg") {
+    if (privacyLevel === "light") {
+      return ["kg_struct"];
+    } else if (privacyLevel === "medium") {
+      return ["id_hash", "kg_struct"];
+    } else if (privacyLevel === "strong") {
+      return ["id_hash", "time_rel", "kg_struct", "lap_agg"];
+    }
+  }
+
+  // 兼容旧值（若下拉被修改）
+  if (dataType === "id") return ["id_hash", "demo_bin", "microagg", "cat_agg"];
+  if (dataType === "time") return ["time_rel", "time_shift"];
+  if (dataType === "text") return ["text_mask", "text_phi_surr", "ds_text"];
+  if (dataType === "kg_raw") return ["kg_struct"];
+
+  return [];
+}
+
+// 取当前选中的 α（仅数值列用）
+function getCurrentAlpha() {
+  const el = document.getElementById("alphaSelect");
+  return el ? parseFloat(el.value) || 0.8 : 0.8;
+}
+
+// 执行数值流水线，返回历史（仅 HR demo 用）；α 从界面读取并注入各算子 maxDiff
+function runNumericPipeline(originalData, pipeline) {
+  const history = [];
+  const base = originalData.slice();
+  const alpha = getCurrentAlpha();
+
+  let current = base.slice();
+  history.push({
+    label: "input",
+    skillId: "input",
+    skillName: "原始输入",
+    data: current.slice(),
+    stats: computeStats(current, base)
+  });
+
+  for (const sid of pipeline) {
+    const skill = SKILL_LIBRARY[sid];
+    if (!skill || skill.target !== "numeric") continue;
+    const cfg = Object.assign({}, skill.defaultConfig, { maxDiff: alpha });
+    current = skill.apply(current, cfg);
+    history.push({
+      label: sid,
+      skillId: sid,
+      skillName: skill.name,
+      data: current.slice(),
+      stats: computeStats(current, base)
+    });
+  }
+  return history;
+}
+
+/****************************************************************
+ * 数据形态 & 任务解释文案
+ ****************************************************************/
+
+const DATASET_DOCS = {
+  numeric: {
+    title: "数值列 HR demo（对应 timeline 中一个连续生理指标）",
+    intro:
+      "这里用一列模拟心率 HR（N(80,10²)）代表时间线中的数值型生理指标。" +
+      "Agent 只在这一视图上真实执行数值算子，并通过“早期恶化风险预测”任务对比变换前后的 Acc / AUC / Brier。",
+    operators: [
+      {
+        id: "num_triplet",
+        reason: "在局部三元组内做小角度正交旋转，保持整列均值/方差不变，单个样本心率变化 <~1bpm。"
+      },
+      {
+        id: "num_noise_proj",
+        reason: "在全列空间中加受限高斯噪声并投影回原有球面，进一步打散模式，但仍保持一二阶矩。"
+      },
+      {
+        id: "num_householder",
+        reason: "对整列应用一次高维 Householder 反射，使整体方向随机化，同时保持均值/方差。"
+      }
+    ],
+    tasks: [
+      {
+        title: "任务 1：基于 HR 预测 24h 内出现不良事件",
+        operators: ["num_triplet", "num_noise_proj"],
+        description:
+          "用 HR 通过 logistic 函数生成“真实风险”，然后用固定的基于 HR 的风险模型预测。" +
+          "因为变换严格保持均值/方差且单点扰动受限，模型的判别能力（AUC）和总体校准（Brier）几乎不变。",
+        utility:
+          "在 demo 中可以看到：原始 vs 变换后 HR 上的 Acc / AUC / Brier 差异通常非常小，" +
+          "说明这类几何保持型算子对风险模型影响有限。"
+      },
+      {
+        title: "任务 2：高心率患者筛查（阈值 HR>90）",
+        operators: ["num_triplet"],
+        description:
+          "简单的临床规则：筛查 HR>90 的患者占比用于工作负载评估或 ICU 转入预警。",
+        utility:
+          "三元组微旋转只做局部小幅变化，大部分真正 HR>90 的患者仍然在高值区间，" +
+          "因此高危人群比例和排序基本保持不变。"
+      }
+    ]
+  },
+
+  patient_profile: {
+    title: "patient_profile：人口学 / 患者级别概览",
+    intro:
+      "该视图包含锚定年龄 (anchor_age)、锚定年份 (anchor_year/anchor_year_group)、性别、" +
+      "种族、婚姻状况、保险类型以及死亡日期等信息，是人口学和总体队列结构的核心。",
+    operators: [
+      {
+        id: "id_hash",
+        reason: "对 subject_id 做哈希/映射，打断与院内 MRN 的直接关联，但仍支持跨表关联。"
+      },
+      {
+        id: "demo_bin",
+        reason: "将年龄与年份做粗分箱，避免暴露精确年龄与年份，降低独特组合风险。"
+      },
+      {
+        id: "microagg",
+        reason: "在 {gender, age_bin, race, marital_status, insurance, year_group} 上做 k-匿名微聚合，" +
+                "保证每个 profile 至少与 k-1 个患者不可区分。"
+      },
+      {
+        id: "cat_agg",
+        reason: "将极少见的种族/语言/保险类别合并为 OTHER，防止稀有模式造成重识别。"
+      }
+    ],
+    tasks: [
+      {
+        title: "任务 1：基于人口学预测 1 年死亡风险 / 再入院风险",
+        operators: ["id_hash", "demo_bin", "microagg", "cat_agg"],
+        description:
+          "使用年龄段、性别、种族、保险类型等特征训练逻辑回归或生存模型，预测 1 年死亡/再入院概率。",
+        utility:
+          "粗分箱和微聚合牺牲了精确年龄，但保留了年龄段、性别、保险等重要协变量；" +
+          "对风险模型而言，一般只需要这些分段信息即可获得稳定、可解释的效应估计。"
+      },
+      {
+        title: "任务 2：人群分层与公平性分析（不同种族/保险组的事件率比较）",
+        operators: ["demo_bin", "cat_agg"],
+        description:
+          "比较不同种族、保险类型在 30d 再入院或急诊复诊上的差异，以评估资源配置与公平性。",
+        utility:
+          "类别合并仅影响极小频数族群，主干族群（如 White / Black / Asian 及主要保险类型）仍被单独保留，" +
+          "因此分层统计与公平性分析仍然可行，同时避免因为极罕见组合而泄露单个患者。"
+      }
+    ]
+  },
+
+  timeline: {
+    title: "timeline_events / complete.jsonl：事件级时间线",
+    intro:
+      "这里包括诊断、用药、化验、转科等按时间排序的细粒度事件，字段中充满绝对时间戳、" +
+      "住院/事件 ID 以及自由文本 notes。",
+    operators: [
+      {
+        id: "id_hash",
+        reason: "对 hadm_id、stay_id、orderid 等所有事件级 ID 做伪 ID 或删除，仅保留 patient_pseudo_id。"
+      },
+      {
+        id: "time_rel",
+        reason: "把所有时间戳统一转换为“距首次入院第几天/小时”，保留顺序与间隔但去掉绝对日期。"
+      },
+      {
+        id: "time_shift",
+        reason: "对每个患者整条时间线做随机平移并降粒度为天/时段，进一步减少日历信息泄露。"
+      },
+      {
+        id: "text_mask",
+        reason: "通过正则匹配电话号码、邮箱、URL、身份证号等显性 PHI 并替换为占位符。"
+      },
+      {
+        id: "text_phi_surr",
+        reason: "使用 de-id 模型识别 notes 中的人名、医院、地址等实体并替换为逼真替身，实现 HIPS。"
+      },
+      {
+        id: "ds_tab",
+        reason: "对极少数敏感实验/药物（如 HIV/毒品筛查）用 DataSifter 方式做部分合成。"
+      }
+    ],
+    tasks: [
+      {
+        title: "任务 1：入院 24h 内的早期败血症预警",
+        operators: ["time_rel", "time_shift", "ds_tab", "text_phi_surr"],
+        description:
+          "根据入院后前 24 小时内的实验室指标、生命体征以及部分结构化的 notes 特征，" +
+          "训练早期败血症风险模型。",
+        utility:
+          "相对时间编码确保“前 24 小时”窗口被正确对齐；时间平移只改变日历，不影响窗口内的序列结构；" +
+          "DataSifter 仅在少数敏感变量上做合成，主流实验项目保持真实分布；" +
+          "文本 de-id 只替换人名/地址等，与症状和病情描述无关，因此对模型特征影响有限。"
+      },
+      {
+        title: "任务 2：药物相关急性肾损伤 (AKI) 信号挖掘",
+        operators: ["id_hash", "time_rel", "time_shift", "ds_tab"],
+        description:
+          "识别某类药物处方后 7 天内肌酐升高达到 AKI 标准的病例比例，用于药物安全性评估。",
+        utility:
+          "时间相对化与平移仍保留“给药→AKI 发生”的相对顺序与时间间隔；" +
+          "ID 哈希切断了与真实住院号的联系，但不影响重复暴露的识别；" +
+          "即便对少数极敏感实验做合成，AKI 判定所需的常规肾功能指标仍保持真实分布，可以可靠估计信号强度。"
+      }
+    ]
+  },
+
+  kg: {
+    title: "kg_example_record_prescriptions_atc.json：药物处方 ATC 知识图谱样本",
+    intro:
+      "该视图以 ATC 码、药物名和疾病/症状节点构成图结构，边表示“处方–疾病”“药物–药物”等关系，" +
+      "用于下游的图挖掘与推荐任务。",
+    operators: [
+      {
+        id: "id_hash",
+        reason: "对 KG 中的 subject_id / hadm_id / admissions_id 做伪 ID 或替换为 kg_sample_id，" +
+                "切断与时间线中患者的可见链接。"
+      },
+      {
+        id: "time_rel",
+        reason: "把 period_begin / period_end 转换为相对窗口索引或长度，比如第 k 个处方窗口。"
+      },
+      {
+        id: "kg_struct",
+        reason: "解析 graph/target/matched_items，确认其中仅包含 ATC/UMLS 概念与关系标签，不含 PHI。"
+      },
+      {
+        id: "lap_agg",
+        reason: "在需要对外公开的聚合图上，对每条边的频次添加 Laplace 噪声，实现 ε-DP。"
+      }
+    ],
+    tasks: [
+      {
+        title: "任务 1：基于处方图的药物–药物关系 / 联合用药推荐",
+        operators: ["kg_struct", "id_hash", "time_rel"],
+        description:
+          "在 ATC/UMLS 图上做 link prediction 或 node embedding，用于识别潜在药物–药物关系和推荐组合处方。",
+        utility:
+          "算子只影响患者 ID 和时间对齐方式，本身的药物节点、疾病节点及其共现结构都被完整保留，" +
+          "因此对纯图挖掘任务几乎没有影响；相对窗口长度仍可用于建模“用药顺序”。"
+      },
+      {
+        title: "任务 2：公开发布的药物共现知识图谱（侧重隐私保护）",
+        operators: ["kg_struct", "lap_agg"],
+        description:
+          "对所有患者的处方关系做聚合，生成带权重的药物–药物/药物–疾病图并公开，用于第三方研究。",
+        utility:
+          "在聚合层面添加 Laplace 噪声，保证单个患者对任一边计数的贡献被 ε-DP 所掩盖；" +
+          "当样本量足够大时，噪声对总体边权影响很小，研究者仍可可靠地挖掘高频模式与新信号。"
+      }
+    ]
+  }
+};
+
+/****************************************************************
+ * 可视化：Skill 列表、Pipeline 图、图表、日志、任务指标
+ ****************************************************************/
+
+function renderSkillList() {
+  const container = document.getElementById("skillList");
+  if (!container) return;
+  container.innerHTML = "";
+  const skills = Object.values(SKILL_LIBRARY || {}).sort((a, b) =>
+    a.target.localeCompare(b.target) || a.id.localeCompare(b.id)
+  );
+  for (const s of skills) {
+    const div = document.createElement("div");
+    div.className = "skill-item";
+
+    const header = document.createElement("div");
+    header.className = "skill-item-header";
+
+    const name = document.createElement("div");
+    name.className = "skill-name";
+    name.textContent = s.name;
+
+    const id = document.createElement("div");
+    id.className = "skill-id";
+    id.textContent = s.id;
+
+    header.appendChild(name);
+    header.appendChild(id);
+    div.appendChild(header);
+
+    const meta = document.createElement("div");
+    meta.className = "skill-meta";
+
+    const t = document.createElement("span");
+    t.className = "skill-tag";
+    t.textContent = s.target;
+    meta.appendChild(t);
+
+    const c = document.createElement("span");
+    c.className = "skill-tag";
+    c.textContent = s.complexity;
+    meta.appendChild(c);
+
+    if (s.guarantees && s.guarantees.length > 0) {
+      const g = document.createElement("span");
+      g.className = "skill-tag";
+      g.textContent = "保证: " + s.guarantees.join(", ");
+      meta.appendChild(g);
+    }
+    div.appendChild(meta);
+
+    const desc = document.createElement("div");
+    desc.className = "skill-desc";
+    desc.textContent = s.description;
+    div.appendChild(desc);
+
+    container.appendChild(div);
+  }
+}
+
+// 绘制 pipeline 图 (SVG)
+function renderPipelineGraph(dataType, pipeline) {
+  const svg = document.getElementById("pipelineGraph");
+  if (!svg) return;
+  const svgns = "http://www.w3.org/2000/svg";
+  const width = svg.clientWidth || 800;
+  const height = svg.clientHeight || 200;
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.innerHTML = "";
+
+  // 箭头定义
+  const defs = document.createElementNS(svgns, "defs");
+  const marker = document.createElementNS(svgns, "marker");
+  marker.setAttribute("id", "arrow");
+  marker.setAttribute("markerWidth", "10");
+  marker.setAttribute("markerHeight", "10");
+  marker.setAttribute("refX", "8");
+  marker.setAttribute("refY", "3");
+  marker.setAttribute("orient", "auto");
+  const path = document.createElementNS(svgns, "path");
+  path.setAttribute("d", "M0,0 L0,6 L9,3 z");
+  path.setAttribute("fill", "#9ca3ff");
+  marker.appendChild(path);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  function addNode(id, label, x, y, kind) {
+    const group = document.createElementNS(svgns, "g");
+    group.setAttribute("transform", `translate(${x},${y})`);
+
+    const circle = document.createElementNS(svgns, "circle");
+    circle.setAttribute("cx", 0);
+    circle.setAttribute("cy", 0);
+    circle.setAttribute("r", kind === "skill" ? 30 : 26);
+    let fill;
+    if (kind === "input") fill = "#0ea5e9";
+    else if (kind === "output") fill = "#22c55e";
+    else if (kind === "agent") fill = "#6366f1";
+    else fill = "#a855f7";
+    circle.setAttribute("fill", fill);
+    circle.setAttribute("fill-opacity", "0.9");
+    circle.setAttribute("stroke", "#020617");
+    circle.setAttribute("stroke-width", "2");
+    group.appendChild(circle);
+
+    const text = document.createElementNS(svgns, "text");
+    text.setAttribute("x", 0);
+    text.setAttribute("y", 0);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("fill", "#e5e7eb");
+    text.setAttribute("font-size", "11");
+    text.setAttribute("font-weight", "500");
+    text.textContent = label;
+    group.appendChild(text);
+
+    svg.appendChild(group);
+    return { id, x, y, kind };
+  }
+
+  function addEdge(from, to) {
+    const line = document.createElementNS(svgns, "line");
+    line.setAttribute("x1", from.x + 30);
+    line.setAttribute("y1", from.y);
+    line.setAttribute("x2", to.x - 30);
+    line.setAttribute("y2", to.y);
+    line.setAttribute("stroke", "#9ca3ff");
+    line.setAttribute("stroke-width", "1.8");
+    line.setAttribute("marker-end", "url(#arrow)");
+    svg.appendChild(line);
+  }
+
+  const centerY = height / 2;
+  let x = 70;
+
+  const inputLabel = (() => {
+    if (dataType === "patient_profile") return "Raw profile";
+    if (dataType === "timeline") return "Raw timeline";
+    if (dataType === "kg") return "Raw KG";
+    if (dataType === "numeric") return "Raw HR";
+    return "Raw data";
+  })();
+
+  const outputLabel = (() => {
+    if (dataType === "patient_profile") return "Safe profile";
+    if (dataType === "timeline") return "Safe timeline";
+    if (dataType === "kg") return "Safe KG";
+    if (dataType === "numeric") return "Safe HR";
+    return "Safe data";
+  })();
+
+  const inputNode = addNode("input", inputLabel, x, centerY, "input");
+  x += 140;
+  const agentNode = addNode("agent", "Privacy Agent", x, centerY, "agent");
+
+  const skillNodes = [];
+  const stepGap = 120;
+  let lastNode = agentNode;
+
+  if (pipeline.length === 0) {
+    // 直接连到输出
+  } else {
+    for (let i = 0; i < pipeline.length; i++) {
+      const sid = pipeline[i];
+      const skill = SKILL_LIBRARY[sid];
+      const label = skill ? skill.id : sid;
+      x += stepGap;
+      const node = addNode(sid, label, x, centerY, "skill");
+      skillNodes.push(node);
+      lastNode = node;
+    }
+  }
+
+  x += 130;
+  const outputNode = addNode("output", outputLabel, x, centerY, "output");
+
+  addEdge(inputNode, agentNode);
+  if (skillNodes.length === 0) {
+    addEdge(agentNode, outputNode);
+  } else {
+    addEdge(agentNode, skillNodes[0]);
+    for (let i = 0; i < skillNodes.length - 1; i++) {
+      addEdge(skillNodes[i], skillNodes[i + 1]);
+    }
+    addEdge(skillNodes[skillNodes.length - 1], outputNode);
+  }
+}
+
+// 更新图表 & 统计（numeric 显示直方图，其它视图显示原始 vs 脱敏后样例表）
+function renderChartsAndStats(history, originalData, dataType) {
+  const numericCharts = document.getElementById("numericCharts");
+  const nonNumericPreview = document.getElementById("nonNumericPreview");
+
+  if (dataType !== "numeric") {
+    if (numericCharts) numericCharts.style.display = "none";
+    if (nonNumericPreview) {
+      nonNumericPreview.style.display = "flex";
+      renderNonNumericSample(dataType);
+    }
+    return;
+  }
+
+  if (numericCharts) numericCharts.style.display = "flex";
+  if (nonNumericPreview) nonNumericPreview.style.display = "none";
+
+  const original = originalData || (history && history[0] && history[0].data);
+  const transformed =
+    history && history.length > 0 ? history[history.length - 1].data : null;
+
+  drawHistogram("originalChart", original, "#60a5fa");
+  drawHistogram("transformedChart", transformed, "#a855f7");
+
+  const s0 = computeStats(original, original);
+  const s1 = transformed ? computeStats(transformed, original) : null;
+
+  const fmt = (v) => (v === null || v === undefined ? "-" : v.toFixed(3));
+
+  const originalStats = document.getElementById("originalStats");
+  originalStats.textContent =
+    `n=${s0.n}, mean=${fmt(s0.mean)}, var=${fmt(s0.variance)}, ` +
+    `min=${fmt(s0.min)}, max=${fmt(s0.max)}`;
+
+  const transformedStats = document.getElementById("transformedStats");
+  if (s1) {
+    transformedStats.textContent =
+      `n=${s1.n}, mean=${fmt(s1.mean)}, var=${fmt(s1.variance)}, ` +
+      `min=${fmt(s1.min)}, max=${fmt(s1.max)}, max|Δ|=${fmt(s1.maxDelta)}`;
+  } else {
+    transformedStats.textContent = "当前数据类型未执行数值算子，仅展示架构。";
+  }
+}
+
+// 示例任务指标展示（numeric = HR 风险预测 + 指标图；其它 = 本视图典型任务列表）
+function renderTaskMetrics(dataType, evalResult) {
+  const titleEl = document.getElementById("taskPanelTitle");
+  const descEl = document.getElementById("taskDescription");
+  const chartWrap = document.getElementById("taskChartWrap");
+  const el = document.getElementById("taskMetrics");
+  if (!el) return;
+
+  if (titleEl) {
+    titleEl.textContent = dataType === "numeric"
+      ? "示例医疗任务：早期恶化风险预测"
+      : dataType === "patient_profile" && evalResult && evalResult.raw
+        ? "示例医疗任务：人口学风险预测与分层公平性"
+        : dataType === "timeline" && evalResult && evalResult.raw
+          ? "示例医疗任务：时间线预警与 AKI 信号"
+          : dataType === "kg" && evalResult && evalResult.task1
+            ? "示例医疗任务：药物共现与 Laplace 聚合"
+            : "示例医疗任务：本视图典型任务";
+  }
+
+  if (dataType === "patient_profile" && evalResult && evalResult.raw && evalResult.transformed) {
+    if (chartWrap) chartWrap.style.display = "block";
+    drawTaskMetricsChart("taskMetricsChart", evalResult);
+    if (descEl) {
+      descEl.innerHTML =
+        "任务 1：基于年龄段/性别/种族/保险预测 1 年死亡或再入院；任务 2：按种族、保险分层 30d 再入院率（脱敏后数据仍可支持）。";
+    }
+    const m0 = evalResult.raw;
+    const m1 = evalResult.transformed;
+    const fmt = (v) => (v == null || Number.isNaN(v) ? "-" : v.toFixed(3));
+    let html = "<b>任务 1：原始 vs 脱敏后 风险模型</b><br>n=" + m0.n + ", 事件率≈" + (m0.posRate * 100).toFixed(1) + "%<br>" +
+      "原始: AUC=" + fmt(m0.auc) + ", Brier=" + fmt(m0.brier) + "<br>脱敏后: AUC=" + fmt(m1.auc) + ", Brier=" + fmt(m1.brier);
+    if (evalResult.task2 && evalResult.task2.byEthnicity && evalResult.task2.byInsurance) {
+      html += "<br><br><b>任务 2：分层 30d 事件率 (95% CI)</b><br>";
+      html += "<table style='font-size:11px;border-collapse:collapse;margin-top:4px'><tr><th>分层</th><th>组</th><th>n</th><th>事件</th><th>率</th><th>CI</th></tr>";
+      evalResult.task2.byEthnicity.forEach(r => {
+        html += "<tr><td>ethnicity</td><td>" + r.group + "</td><td>" + r.n + "</td><td>" + r.events + "</td><td>" + (r.rate * 100).toFixed(1) + "%</td><td>" + (r.ci_low * 100).toFixed(1) + "–" + (r.ci_high * 100).toFixed(1) + "%</td></tr>";
+      });
+      evalResult.task2.byInsurance.forEach(r => {
+        html += "<tr><td>insurance</td><td>" + r.group + "</td><td>" + r.n + "</td><td>" + r.events + "</td><td>" + (r.rate * 100).toFixed(1) + "%</td><td>" + (r.ci_low * 100).toFixed(1) + "–" + (r.ci_high * 100).toFixed(1) + "%</td></tr>";
+      });
+      html += "</table>";
+    }
+    el.innerHTML = html;
+    return;
+  }
+
+  if (dataType === "timeline" && evalResult && evalResult.raw && evalResult.transformed) {
+    if (chartWrap) chartWrap.style.display = "block";
+    drawTaskMetricsChart("taskMetricsChart", evalResult);
+    if (descEl) {
+      descEl.innerHTML =
+        "任务 1：入院 24h 内早期恶化预警（基于首日指标的风险评分）；任务 2：脱敏后仍可计算「给药/事件后 1–2 天高值」比例（类 AKI 信号）。";
+    }
+    const m0 = evalResult.raw;
+    const m1 = evalResult.transformed;
+    const fmt = (v) => (v == null || Number.isNaN(v) ? "-" : v.toFixed(3));
+    let html = "<b>任务 1：入院 24h 内早期恶化预警</b><br>n=" + m0.n + ", 事件率≈" + (m0.posRate * 100).toFixed(1) + "%<br>" +
+      "原始时间戳: AUC=" + fmt(m0.auc) + ", Brier=" + fmt(m0.brier) + "<br>相对时间脱敏后: AUC=" + fmt(m1.auc) + ", Brier=" + fmt(m1.brier);
+    if (evalResult.task2) {
+      html += "<br><br><b>任务 2：类 AKI 信号（day 1–2 内高值比例）</b><br>";
+      html += "患者数 n=" + evalResult.task2.nPatients + "<br>";
+      html += "原始: " + (evalResult.task2.rateRaw * 100).toFixed(1) + "% &nbsp; 脱敏后: " + (evalResult.task2.rateDeid * 100).toFixed(1) + "%（顺序保留，率一致）";
+    }
+    el.innerHTML = html;
+    return;
+  }
+
+  if (dataType === "kg" && evalResult && evalResult.task1 && evalResult.task2) {
+    if (chartWrap) chartWrap.style.display = "none";
+    drawTaskMetricsChart("taskMetricsChart", null);
+    if (descEl) {
+      descEl.innerHTML =
+        "任务 1：药物–药物共现（同患者处方对）；任务 2：边频次 + Laplace 噪声（ε-DP 风格），脱敏后仍可做聚合分析。";
+    }
+    const rawPairs = evalResult.task1.raw || [];
+    const deidPairs = evalResult.task1.deid || [];
+    const maxCount = Math.max(1, ...rawPairs.map(p => p.count), ...deidPairs.map(p => p.count));
+    let html = "<b>任务 1：药物–药物共现 — 原始 vs 脱敏后（对比）</b><br>";
+    html += "<div style='font-size:10px;color:#94a3b8;margin-bottom:4px'>脱敏仅改 subject_id / period，共现结构不变 → 频次应一致</div>";
+    html += "<table style='font-size:11px;border-collapse:collapse;width:100%'>";
+    html += "<tr><th>共现对</th><th>原始频次</th><th>脱敏后频次</th><th style='width:52px'>对比</th></tr>";
+    for (let i = 0; i < Math.max(rawPairs.length, deidPairs.length); i++) {
+      const r = rawPairs[i] || { pair: "-", count: 0 };
+      const d = deidPairs[i] || { pair: "-", count: 0 };
+      const same = r.pair === d.pair && r.count === d.count;
+      const pairLabel = r.pair !== "-" ? r.pair : d.pair;
+      html += "<tr><td>" + pairLabel + "</td><td>" + r.count + "</td><td>" + d.count + "</td><td>" + (same ? "✓ 一致" : "—") + "</td></tr>";
+    }
+    html += "</table>";
+
+    html += "<br><b>任务 2：边频次 — 原始 vs Laplace 加噪（柱条对比）</b><br>";
+    html += "<div style='font-size:10px;color:#94a3b8;margin-bottom:4px'>加噪后计数略变，量级与排序仍可做聚合分析</div>";
+    html += "<table style='font-size:11px;border-collapse:collapse;width:100%'>";
+    html += "<tr><th>药物</th><th>原始</th><th>加噪</th><th>Δ</th><th style='width:140px'>柱条对比</th></tr>";
+    const task2List = evalResult.task2.slice(0, 6);
+    const maxRaw = Math.max(1, ...task2List.map(x => x.rawCount));
+    task2List.forEach(r => {
+      const delta = r.noisyCount - r.rawCount;
+      const deltaStr = (delta >= 0 ? "+" : "") + delta;
+      const w = 60;
+      const barRaw = Math.round((r.rawCount / maxRaw) * w);
+      const barNoisy = Math.round((r.noisyCount / maxRaw) * w);
+      html += "<tr><td>" + r.drug + "</td><td>" + r.rawCount + "</td><td>" + r.noisyCount + "</td><td>" + deltaStr + "</td>";
+      html += "<td><span style='display:inline-block;width:" + barRaw + "px;height:8px;background:#60a5fa;vertical-align:middle' title='原始'></span>";
+      html += " <span style='display:inline-block;width:" + barNoisy + "px;height:8px;background:#a855f7;vertical-align:middle' title='加噪'></span></td></tr>";
+    });
+    html += "</table>";
+    html += "<div style='font-size:10px;margin-top:4px'><span style='display:inline-block;width:10px;height:8px;background:#60a5fa'></span> 原始 &nbsp; <span style='display:inline-block;width:10px;height:8px;background:#a855f7'></span> 加噪</div>";
+    el.innerHTML = html;
+    return;
+  }
+
+  if (dataType !== "numeric") {
+    if (chartWrap) chartWrap.style.display = "none";
+    drawTaskMetricsChart("taskMetricsChart", null);
+    const doc = DATASET_DOCS[dataType] || DATASET_DOCS.numeric;
+    if (descEl) {
+      descEl.innerHTML =
+        "本视图（<b>" + (doc.title || dataType) + "</b>）的典型下游任务如下，脱敏后数据仍可支持。";
+    }
+    if (doc.tasks && doc.tasks.length > 0) {
+      let html = "";
+      doc.tasks.forEach((t, idx) => {
+        const opNames = (t.operators || []).map(id => {
+          const s = SKILL_LIBRARY[id];
+          return s ? s.id : id;
+        }).join(", ");
+        html +=
+          `<div class="dataset-task" style="margin-bottom:10px;">` +
+          `<div class="dataset-task-title">任务 ${idx + 1}：${t.title}</div>` +
+          `<div class="dataset-task-body">` +
+          `<b>任务简介：</b>${t.description}<br>` +
+          `<b>涉及算子：</b>${opNames}<br>` +
+          `<b>隐私后仍可满足任务：</b>${t.utility}` +
+          `</div></div>`;
+      });
+      el.innerHTML = html;
+    } else {
+      el.textContent = "暂无该视图的示例任务说明。";
+    }
+    return;
+  }
+
+  if (chartWrap) chartWrap.style.display = "block";
+  if (descEl) {
+    descEl.innerHTML =
+      "测试数据集：模拟心率 HR + 是否在 24h 内发生不良事件（二分类）。" +
+      "使用简单的“基于心率的风险评分模型”分别在 <b>原始</b> 和 <b>隐私变换后</b> 的数据上评估，" +
+      "对比 Acc / AUC / Brier 等指标，观察隐私处理前后性能变化。";
+  }
+
+  if (!evalResult) {
+    drawTaskMetricsChart("taskMetricsChart", null);
+    el.textContent =
+      "尚未生成 HR 测试集或执行隐私变换。点击左侧“重新采样 HR demo / 让 Agent 规划并运行”查看效果。";
+    return;
+  }
+
+  drawTaskMetricsChart("taskMetricsChart", evalResult);
+
+  const m0 = evalResult.raw;
+  const m1 = evalResult.transformed;
+  const fmt = (v) =>
+    v === null || v === undefined || Number.isNaN(v) ? "-" : v.toFixed(3);
+  const fmtPct = (v) =>
+    v === null || v === undefined || Number.isNaN(v)
+      ? "-"
+      : (v * 100).toFixed(1) + "%";
+
+  function fmtDelta(a, b, loss = false) {
+    if (a === null || b === null || Number.isNaN(a) || Number.isNaN(b)) return "";
+    const d = b - a;
+    const sign = d >= 0 ? "+" : "";
+    if (loss) {
+      return ` (Δ=${sign}${d.toFixed(3)}, 越低越好)`;
+    }
+    return ` (Δ=${sign}${d.toFixed(3)})`;
+  }
+
+  el.innerHTML =
+    `测试集大小 n = ${m0.n}, 事件发生率 ≈ ${fmtPct(m0.posRate)}<br>` +
+    `<b>基线：原始心率特征</b><br>` +
+    `  · 准确率 Acc = ${fmt(m0.acc)}, AUC = ${fmt(m0.auc)}, Brier = ${fmt(m0.brier)}<br>` +
+    `<b>隐私变换后心率特征</b><br>` +
+    `  · 准确率 Acc = ${fmt(m1.acc)}${fmtDelta(m0.acc, m1.acc)}, ` +
+    `AUC = ${fmt(m1.auc)}${fmtDelta(m0.auc, m1.auc)}, ` +
+    `Brier = ${fmt(m1.brier)}${fmtDelta(m0.brier, m1.brier, true)}`;
+}
+
+// 数据形态 & 任务解释
+function renderDatasetDoc(dataType, privacyLevel, pipeline) {
+  const docEl = document.getElementById("datasetDoc");
+  const doc = DATASET_DOCS[dataType] || DATASET_DOCS.numeric;
+  let html = "";
+
+  html += `<div class="dataset-doc-title">${doc.title}</div>`;
+  html += `<div>${doc.intro}</div>`;
+
+  html += `<div class="dataset-doc-subtitle">当前隐私强度 = <code>${privacyLevel}</code>，Agent 选择的算子：</div>`;
+  html += `<div class="dataset-doc-ops"><ul>`;
+  for (const op of doc.operators) {
+    const active = pipeline.includes(op.id);
+    const skill = SKILL_LIBRARY[op.id];
+    const displayName = skill ? skill.name : op.id;
+    html += `<li>${active ? "✅" : "・"} <b>${displayName}</b> —— ${op.reason}</li>`;
+  }
+  html += `</ul></div>`;
+
+  html += `<div class="dataset-doc-subtitle">示例医疗任务（每种数据给出两个典型任务）</div>`;
+  doc.tasks.forEach((t, idx) => {
+    const opNames = (t.operators || []).map(id => {
+      const s = SKILL_LIBRARY[id];
+      return s ? s.id : id;
+    }).join(", ");
+    html += `<div class="dataset-task">
+      <div class="dataset-task-title">任务 ${idx + 1}：${t.title}</div>
+      <div class="dataset-task-body">
+        <b>任务简介：</b>${t.description}<br>
+        <b>涉及算子：</b>${opNames}<br>
+        <b>隐私后数据如何仍然满足任务：</b>${t.utility}
+      </div>
+    </div>`;
+  });
+
+  docEl.innerHTML = html;
+}
+
+// 日志
+function renderLog(dataType, privacyLevel, pipeline, history, evalResult) {
+  const logEl = document.getElementById("log");
+  let text = "";
+  text += `[Plan] dataset=${dataType}, privacy_level=${privacyLevel}\n`;
+  if (pipeline.length === 0) {
+    text += "  (没有规划到任何算子)\n";
+  } else {
+    text += "  Pipeline: " + pipeline.join(" -> ") + "\n";
+  }
+  text += "\n";
+
+  if (dataType !== "numeric") {
+    text += "\n";
+    logEl.textContent = text;
+    return;
+  }
+
+  if (!history || history.length === 0) {
+    text += "当前尚未为 HR demo 执行算子。\n";
+    logEl.textContent = text;
+    return;
+  }
+
+  const fmt = (v) => (v === null || v === undefined ? "-" : v.toFixed(4));
+
+  for (let i = 0; i < history.length; i++) {
+    const h = history[i];
+    const s = h.stats;
+    if (!s) continue;
+    if (h.skillId === "input") {
+      text += `[Step ${i}] ${h.skillName}:\n`;
+      text += `  mean=${fmt(s.mean)}, var=${fmt(s.variance)}\n\n`;
+    } else {
+      text += `[Step ${i}] ${h.skillName} [${h.skillId}]:\n`;
+      text += `  mean=${fmt(s.mean)}, var=${fmt(s.variance)}, max|Δ|=${fmt(s.maxDelta)}\n\n`;
+    }
+  }
+
+  if (evalResult) {
+    const m0 = evalResult.raw;
+    const m1 = evalResult.transformed;
+    text += "[Task] 早期恶化风险预测 (基于 HR 的简单 logistic 模型)\n";
+    text += `  Raw:    Acc=${fmt(m0.acc)}, AUC=${fmt(m0.auc)}, Brier=${fmt(m0.brier)}\n`;
+    text += `  Trans.: Acc=${fmt(m1.acc)}, AUC=${fmt(m1.auc)}, Brier=${fmt(m1.brier)}\n\n`;
+  }
+
+  text += "说明：前端算子与任务评估为 JS 简化实现，仅用于可视化与直觉展示；严谨实验请使用 Python 版算子与真实任务脚本。\n";
+  logEl.textContent = text;
+}
+
+/****************************************************************
+ * 事件绑定 & 初始化
+ ****************************************************************/
+
+let currentNumericData = [];
+let currentLabels = null;
+
+function runAgentAndUpdate() {
+  try {
+    const dataTypeEl = document.getElementById("dataType");
+    const privacyLevelEl = document.getElementById("privacyLevel");
+    const dataType = (dataTypeEl && dataTypeEl.value) || "numeric";
+    const privacyLevel = (privacyLevelEl && privacyLevelEl.value) || "medium";
+    const alphaWrap = document.getElementById("alphaControlWrap");
+    if (alphaWrap) alphaWrap.style.display = dataType === "numeric" ? "block" : "none";
+
+    const pipeline = planPipeline(dataType, privacyLevel) || [];
+    renderPipelineGraph(dataType, pipeline);
+
+    let history = null;
+    let evalResult = null;
+
+    if (dataType === "numeric") {
+      if (!currentNumericData || currentNumericData.length === 0) {
+        const dataSizeEl = document.getElementById("dataSize");
+        const n = parseInt((dataSizeEl && dataSizeEl.value) || "300", 10);
+        currentNumericData = generateSyntheticNumeric(Math.max(30, Math.min(1000, n)));
+        currentLabels = generateLabelsFromNumeric(currentNumericData);
+      }
+      history = runNumericPipeline(currentNumericData, pipeline);
+
+      if (history && history.length > 0 &&
+          currentLabels && currentLabels.length === currentNumericData.length) {
+        const transformedData = history[history.length - 1].data;
+        evalResult = evaluateClinicalTask(currentNumericData, transformedData, currentLabels);
+      }
+    } else if (dataType === "patient_profile") {
+      const nProfile = 400;
+      const profileSeed = Math.floor(Math.random() * 1e6);
+      const profileData = generateSyntheticPatientProfile(nProfile, profileSeed);
+      evalResult = evaluatePatientProfileTask1(profileData.raw, profileData.deid, profileData.y_1y);
+      const deidWithOutcome = profileData.deid.map((r, i) => ({ ...r, y_30d: profileData.y_30d[i] }));
+      evalResult.task2 = {
+        byEthnicity: stratifiedRates(deidWithOutcome, "ethnicity", "y_30d"),
+        byInsurance: stratifiedRates(deidWithOutcome, "insurance", "y_30d"),
+      };
+    } else if (dataType === "timeline") {
+      const nPatients = 60;
+      const timelineSeed = Math.floor(Math.random() * 1e6);
+      const rawEvents = generateSyntheticTimeline(nPatients, timelineSeed);
+      const deidEvents = applyTimelineDeid(rawEvents);
+      const bySubj = {};
+      rawEvents.forEach(ev => {
+        if (!bySubj[ev.subject_id]) bySubj[ev.subject_id] = [];
+        bySubj[ev.subject_id].push(ev);
+      });
+      rawEvents.forEach(ev => {
+        ev._day = Math.floor((ev.charttimeMs - ev.t0) / (24 * 60 * 60 * 1000));
+      });
+      const labels = [];
+      const subjIds = Object.keys(bySubj).sort();
+      subjIds.forEach(sid => {
+        const day0 = bySubj[sid].filter(e => e._day === 0).map(e => e.valuenum);
+        const mean0 = day0.length ? day0.reduce((a, b) => a + b, 0) / day0.length : 90;
+        const risk = (mean0 - 90) / 25 + (timelineSeed % 100) / 500 - 0.1;
+        labels.push(Math.random() < sigmoid(risk) ? 1 : 0);
+      });
+      evalResult = evaluateTimelineTask1(rawEvents, deidEvents, labels);
+      if (evalResult) {
+        evalResult.task2 = evaluateTimelineTask2(rawEvents, deidEvents);
+      }
+    } else if (dataType === "kg") {
+      const nEdges = 50;
+      const kgSeed = Math.floor(Math.random() * 1e6);
+      const rawEdges = generateSyntheticKG(nEdges, kgSeed);
+      const deidEdges = applyKGDeid(rawEdges);
+      evalResult = {
+        task1: evaluateKGTask1(rawEdges, deidEdges),
+        task2: evaluateKGTask2(deidEdges, 0.5),
+      };
+    }
+
+    renderChartsAndStats(history, currentNumericData, dataType);
+    renderTaskMetrics(dataType, evalResult);
+    renderDatasetDoc(dataType, privacyLevel, pipeline);
+    renderAttackReport(
+      dataType,
+      history,
+      dataType === "numeric" ? currentNumericData : null,
+      (SAMPLES_NON_NUMERIC[dataType] && SAMPLES_NON_NUMERIC[dataType].raw) || null,
+      (SAMPLES_NON_NUMERIC[dataType] && SAMPLES_NON_NUMERIC[dataType].deid) || null
+    );
+    renderLog(dataType, privacyLevel, pipeline, history, evalResult);
+  } catch (e) {
+    console.error("runAgentAndUpdate 错误:", e);
+    const logEl = document.getElementById("log");
+    if (logEl) logEl.textContent = "[渲染错误] " + (e.message || String(e)) + "\n请打开开发者工具控制台查看详情。";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    renderSkillList();
+    const dataSizeEl = document.getElementById("dataSize");
+    const n = parseInt((dataSizeEl && dataSizeEl.value) || "300", 10);
+    currentNumericData = generateSyntheticNumeric(Math.max(30, Math.min(1000, n)));
+    currentLabels = generateLabelsFromNumeric(currentNumericData);
+
+    const btnResample = document.getElementById("btnResample");
+    if (btnResample) {
+      btnResample.addEventListener("click", () => {
+        const nVal = parseInt((document.getElementById("dataSize") && document.getElementById("dataSize").value) || "300", 10);
+        const n = Math.max(30, Math.min(1000, nVal));
+        currentNumericData = generateSyntheticNumeric(n);
+        currentLabels = generateLabelsFromNumeric(currentNumericData);
+        runAgentAndUpdate();
+      });
+    }
+
+    const btnRun = document.getElementById("btnRun");
+    if (btnRun) {
+      btnRun.addEventListener("click", () => runAgentAndUpdate());
+    }
+
+    const dataTypeEl = document.getElementById("dataType");
+    if (dataTypeEl) {
+      dataTypeEl.addEventListener("change", () => runAgentAndUpdate());
+    }
+    const alphaEl = document.getElementById("alphaSelect");
+    if (alphaEl) {
+      alphaEl.addEventListener("change", () => runAgentAndUpdate());
+    }
+
+    // 延迟一帧再渲染，确保容器已布局（clientWidth 等有效），避免内容不显示
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => runAgentAndUpdate());
+    });
+  } catch (e) {
+    console.error("Privacy Agent Demo 初始化错误:", e);
+    const logEl = document.getElementById("log");
+    if (logEl) logEl.textContent = "[错误] " + (e.message || String(e)) + "\n请打开控制台查看详情。";
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+{
+  "patient_profile": [
+    {
+      "subject_id": "20a7f83d29f9",
+      "gender": "M",
+      "anchor_age": "[65,69]",
+      "ethnicity": "WHITE",
+      "insurance": "Medicare"
+    },
+    {
+      "subject_id": "373d4bc649c8",
+      "gender": "F",
+      "anchor_age": "[50,54]",
+      "ethnicity": "BLACK",
+      "insurance": "Medicaid"
+    },
+    {
+      "subject_id": "2c66cad6077e",
+      "gender": "M",
+      "anchor_age": "[80,84]",
+      "ethnicity": "ASIAN",
+      "insurance": "Private"
+    },
+    {
+      "subject_id": "d9b8002f2970",
+      "gender": "F",
+      "anchor_age": "[40,44]",
+      "ethnicity": "WHITE",
+      "insurance": "Government"
+    },
+    {
+      "subject_id": "7eec67ba1e2d",
+      "gender": "M",
+      "anchor_age": "[70,74]",
+      "ethnicity": "WHITE",
+      "insurance": "Medicare"
+    },
+    {
+      "subject_id": "f56fc909cc4a",
+      "gender": "F",
+      "anchor_age": "[35,39]",
+      "ethnicity": "BLACK",
+      "insurance": "Medicaid"
+    },
+    {
+      "subject_id": "c897c861be7b",
+      "gender": "M",
+      "anchor_age": "[55,59]",
+      "ethnicity": "ASIAN",
+      "insurance": "Private"
+    },
+    {
+      "subject_id": "70247294e910",
+      "gender": "F",
+      "anchor_age": "[75,79]",
+      "ethnicity": "WHITE",
+      "insurance": "Medicare"
+    },
+    {
+      "subject_id": "5013200fb886",
+      "gender": "M",
+      "anchor_age": "[45,49]",
+      "ethnicity": "OTHER",
+      "insurance": "OTHER"
+    },
+    {
+      "subject_id": "2c6c99a88732",
+      "gender": "F",
+      "anchor_age": "[60,64]",
+      "ethnicity": "WHITE",
+      "insurance": "Private"
+    }
+  ],
+  "timeline_events": [
+    {
+      "subject_id": "20a7f83d29f9",
+      "hadm_id": "8c10825e7d5c",
+      "charttime": -173.0,
+      "item": "Heart rate",
+      "valuenum": 95.4108870015018,
+      "text": "Avery Nguyen reports chest pain and mild cough."
+    },
+    {
+      "subject_id": "20a7f83d29f9",
+      "hadm_id": "8c10825e7d5c",
+      "charttime": -173.0,
+      "item": "Progress note",
+      "valuenum": NaN,
+      "text": "Seen by doctor at 8:00 pm on [DATE], email [EMAIL]."
+    },
+    {
+      "subject_id": "20a7f83d29f9",
+      "hadm_id": "8c10825e7d5c",
+      "charttime": -173.0,
+      "item": "Labs",
+      "valuenum": 7.2,
+      "text": "Glucose 120 mg/dL, BUN 18."
+    },
+    {
+      "subject_id": "373d4bc649c8",
+      "hadm_id": "f2629ca683b1",
+      "charttime": 82.0,
+      "item": "Temperature",
+      "valuenum": 38.4,
+      "text": "Jamie Lee has fever and headache, called [PHONE]."
+    },
+    {
+      "subject_id": "373d4bc649c8",
+      "hadm_id": "f2629ca683b1",
+      "charttime": 83.0,
+      "item": "Note",
+      "valuenum": NaN,
+      "text": "Patient improved after antipyretics. Discharge planned tomorrow."
+    },
+    {
+      "subject_id": "2c66cad6077e",
+      "hadm_id": "eaa6e5b0db97",
+      "charttime": 144.0,
+      "item": "Note",
+      "valuenum": NaN,
+      "text": "Patient lives in Boston, ID [ID], admitted on [DATE]."
+    },
+    {
+      "subject_id": "2c66cad6077e",
+      "hadm_id": "eaa6e5b0db97",
+      "charttime": 145.0,
+      "item": "Blood pressure",
+      "valuenum": 128.0,
+      "text": "BP 128/82, HR 72."
+    },
+    {
+      "subject_id": "d9b8002f2970",
+      "hadm_id": "416da46a9c95",
+      "charttime": 210.0,
+      "item": "Admission",
+      "valuenum": NaN,
+      "text": "Elective procedure. Contact: [EMAIL], [PHONE]."
+    },
+    {
+      "subject_id": "7eec67ba1e2d",
+      "hadm_id": "82c30edeb012",
+      "charttime": -58.0,
+      "item": "Heart rate",
+      "valuenum": 88.85702080192993,
+      "text": "Jordan Brown, post-op day 1. Vital signs stable."
+    },
+    {
+      "subject_id": "f56fc909cc4a",
+      "hadm_id": "b12c25323187",
+      "charttime": 131.0,
+      "item": "Labs",
+      "valuenum": 5.1,
+      "text": "Potassium 5.1, Na 138. Follow up in clinic."
+    },
+    {
+      "subject_id": "c897c861be7b",
+      "hadm_id": "7040ce515d7f",
+      "charttime": 20.0,
+      "item": "Progress note",
+      "valuenum": NaN,
+      "text": "Diabetes follow-up. A1c 7.2%. Address: 123 Alex Brown, Boston."
+    },
+    {
+      "subject_id": "70247294e910",
+      "hadm_id": "7b2a101f4397",
+      "charttime": 183.0,
+      "item": "Temperature",
+      "valuenum": 37.06805123577823,
+      "text": "Chris Lopez, afebrile. Discharge to rehab [DATE]."
+    },
+    {
+      "subject_id": "5013200fb886",
+      "hadm_id": "e63d0fdfaa88",
+      "charttime": -37.0,
+      "item": "Note",
+      "valuenum": NaN,
+      "text": "New patient. DOB [DATE]. SSN on file."
+    },
+    {
+      "subject_id": "2c6c99a88732",
+      "hadm_id": "a4d4f577bf03",
+      "charttime": 232.0,
+      "item": "Heart rate",
+      "valuenum": 76.0,
+      "text": "Annual physical. No PHI in this note."
+    }
+  ]
+}

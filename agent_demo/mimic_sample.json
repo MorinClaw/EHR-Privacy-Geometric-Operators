@@ -1,0 +1,30 @@
+{
+  "patient_profile": [
+    { "subject_id": 100001, "gender": "M", "anchor_age": 67, "ethnicity": "WHITE", "insurance": "Medicare" },
+    { "subject_id": 100002, "gender": "F", "anchor_age": 54, "ethnicity": "BLACK", "insurance": "Medicaid" },
+    { "subject_id": 100003, "gender": "M", "anchor_age": 83, "ethnicity": "ASIAN", "insurance": "Private" },
+    { "subject_id": 100004, "gender": "F", "anchor_age": 41, "ethnicity": "WHITE", "insurance": "Government" },
+    { "subject_id": 100005, "gender": "M", "anchor_age": 72, "ethnicity": "WHITE", "insurance": "Medicare" },
+    { "subject_id": 100006, "gender": "F", "anchor_age": 38, "ethnicity": "BLACK", "insurance": "Medicaid" },
+    { "subject_id": 100007, "gender": "M", "anchor_age": 59, "ethnicity": "ASIAN", "insurance": "Private" },
+    { "subject_id": 100008, "gender": "F", "anchor_age": 76, "ethnicity": "WHITE", "insurance": "Medicare" },
+    { "subject_id": 100009, "gender": "M", "anchor_age": 45, "ethnicity": "HISPANIC", "insurance": "Self Pay" },
+    { "subject_id": 100010, "gender": "F", "anchor_age": 62, "ethnicity": "WHITE", "insurance": "Private" }
+  ],
+  "timeline_events": [
+    { "subject_id": 100001, "hadm_id": 200001, "charttime": "2148-04-21T13:45:00", "item": "Heart rate", "valuenum": 95.0, "text": "John Smith reports chest pain and mild cough." },
+    { "subject_id": 100001, "hadm_id": 200001, "charttime": "2148-04-21T20:10:00", "item": "Progress note", "valuenum": null, "text": "Seen by doctor at 8:00 pm on 2148-04-21, email john.smith@example.com." },
+    { "subject_id": 100001, "hadm_id": 200001, "charttime": "2148-04-22T08:00:00", "item": "Labs", "valuenum": 7.2, "text": "Glucose 120 mg/dL, BUN 18." },
+    { "subject_id": 100002, "hadm_id": 200010, "charttime": "2149-01-02T09:15:00", "item": "Temperature", "valuenum": 38.4, "text": "Mary Johnson has fever and headache, called 555-123-4567." },
+    { "subject_id": 100002, "hadm_id": 200010, "charttime": "2149-01-02T14:30:00", "item": "Note", "valuenum": null, "text": "Patient improved after antipyretics. Discharge planned tomorrow." },
+    { "subject_id": 100003, "hadm_id": 200020, "charttime": "2149-03-05T11:30:00", "item": "Note", "valuenum": null, "text": "Patient lives in Boston, ID 123456789, admitted on 03/05/2149." },
+    { "subject_id": 100003, "hadm_id": 200020, "charttime": "2149-03-05T16:00:00", "item": "Blood pressure", "valuenum": 128.0, "text": "BP 128/82, HR 72." },
+    { "subject_id": 100004, "hadm_id": 200030, "charttime": "2149-05-10T10:00:00", "item": "Admission", "valuenum": null, "text": "Elective procedure. Contact: jane.doe@hospital.org, 555-987-6543." },
+    { "subject_id": 100005, "hadm_id": 200040, "charttime": "2148-08-15T07:45:00", "item": "Heart rate", "valuenum": 88.0, "text": "Robert Brown, post-op day 1. Vital signs stable." },
+    { "subject_id": 100006, "hadm_id": 200050, "charttime": "2149-02-20T12:00:00", "item": "Labs", "valuenum": 5.1, "text": "Potassium 5.1, Na 138. Follow up in clinic." },
+    { "subject_id": 100007, "hadm_id": 200060, "charttime": "2148-11-01T09:00:00", "item": "Progress note", "valuenum": null, "text": "Diabetes follow-up. A1c 7.2%. Address: 123 Main St, Boston." },
+    { "subject_id": 100008, "hadm_id": 200070, "charttime": "2149-04-12T14:00:00", "item": "Temperature", "valuenum": 36.8, "text": "Elizabeth White, afebrile. Discharge to rehab 04/14/2149." },
+    { "subject_id": 100009, "hadm_id": 200080, "charttime": "2148-09-05T11:15:00", "item": "Note", "valuenum": null, "text": "New patient. DOB 01/15/2079. SSN on file." },
+    { "subject_id": 100010, "hadm_id": 200090, "charttime": "2149-06-01T08:30:00", "item": "Heart rate", "valuenum": 76.0, "text": "Annual physical. No PHI in this note." }
+  ]
+}

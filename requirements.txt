@@ -1,0 +1,14 @@
+# Core numerics
+numpy>=1.23
+pandas>=2.0
+scipy>=1.10
+
+# ML / plots (used by several experiments)
+scikit-learn>=1.2
+matplotlib>=3.7
+
+# Optional: B.5 CTGAN baseline
+# ctgan>=0.5
+
+# Optional: gradient boosting in some B4 paths
+# xgboost>=2.0

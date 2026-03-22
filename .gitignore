@@ -1,0 +1,50 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Experiment outputs (regenerate locally)
+**/results/
+**/results_*/
+**/out_*/
+*.log
+
+# P6 generated tables / plots (keep scripts only)
+P6_alpha_hierarchy/out/
+P6_alpha_hierarchy/pr_*.csv
+P6_alpha_hierarchy/tmp_*/
+
+# Large / local data (place under data_preparation/ or outside repo)
+data_preparation/
+
+# Regenerate with P3_weak_interpolation/code/build_ts48h_weak.py (not shipped)
+P3_weak_interpolation/ts_48h_weak/*.csv
+*.npy
+*.npz
+*.h5
+*.parquet
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Coverage / test
+.pytest_cache/
+.coverage
+htmlcov/
