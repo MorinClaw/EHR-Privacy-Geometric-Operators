@@ -225,4 +225,4 @@ The protocol evaluates de-identified data under three **leakage levels** and fou
 
 ## License
 
-MIT © 2025 Maolin Wang
+MIT © 2025 HKAI-Sci, City University of Hong Kong
