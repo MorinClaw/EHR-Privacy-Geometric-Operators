@@ -72,22 +72,21 @@ This guarantees exact mean/variance preservation (Constraint C1) and enables a u
 │   │   └── attack_d_attribute.py
 │   └── PAPER_Privacy_Evaluation_Protocol.md
 │
-├── A2_operator_grid/               # §5.2 — Operator application & parameter grid
-├── A3_theory_validation/           # §5.3 — Theory property validation (C1–C4)
-├── A4_single_column_distribution/  # §5.4 — KS / distribution analysis
-├── A5_multivariate_correlation/    # §5.5 — Correlation structure preservation
-├── A6_temporal_structure/          # §5.6 — ACF / spectral analysis
-├── A7_privacy_attacks/             # §5.7 — Reconstruction & privacy attacks
-│
-├── B2_privacy_utility/             # §7 — Privacy grid search & pipeline planning
-├── B3_theory_e2e/                  # §7 — End-to-end theory constraint checks
-├── B4_privacy_utility_tradeoff/    # §7 — Downstream tasks (LOS, mortality, readmission)
-├── B5_complexity_compute/          # §7 — Runtime & scaling analysis
-├── B6_agent_ablation/              # §7 — Operator & agent ablation
-│
-├── P7_qmix_pilot/                  # §5.8 — Q-mix pilot (privacy cliff experiment)
-├── P3_weak_interpolation/          # Supporting: weak interpolation pipeline
-├── P6_alpha_hierarchy/             # Supporting: α-hierarchy Pareto plots
+├── experiments/                    # All experiment scripts and results
+│   ├── A2_operator_grid/           # §5.2 — Operator application & parameter grid
+│   ├── A3_theory_validation/       # §5.3 — Theory property validation (C1–C4)
+│   ├── A4_single_column_distribution/ # §5.4 — KS / distribution analysis
+│   ├── A5_multivariate_correlation/ # §5.5 — Correlation structure preservation
+│   ├── A6_temporal_structure/      # §5.6 — ACF / spectral analysis
+│   ├── A7_privacy_attacks/         # §5.7 — Reconstruction & privacy attacks
+│   ├── B2_privacy_utility/         # §7 — Privacy grid search & pipeline planning
+│   ├── B3_theory_e2e/              # §7 — End-to-end theory constraint checks
+│   ├── B4_privacy_utility_tradeoff/ # §7 — Downstream tasks (LOS, mortality, readmission)
+│   ├── B5_complexity_compute/      # §7 — Runtime & scaling analysis
+│   ├── B6_agent_ablation/          # §7 — Operator & agent ablation
+│   ├── P3_weak_interpolation/      # Supporting: weak interpolation pipeline
+│   ├── P6_alpha_hierarchy/         # Supporting: α-hierarchy Pareto plots
+│   └── P7_qmix_pilot/              # §5.8 — Q-mix pilot (privacy cliff experiment)
 │
 ├── docs/
 │   ├── DIRECTORY_LAYOUT.md
@@ -162,36 +161,36 @@ Alternatively, pass explicit `--data-dir` / `--input` paths to each script. `rep
 
 **Operator grid (A2):**
 ```bash
-cd A2_operator_grid/code
+cd experiments/A2_operator_grid/code
 python exp_operators_mimic.py --variables HR Glucose SBP
 ```
 
 **Theory validation (A3):**
 ```bash
-cd A3_theory_validation/code
+cd experiments/A3_theory_validation/code
 python exp_a3_sanity_check.py
 ```
 
 **Privacy attacks (A7):**
 ```bash
-cd A7_privacy_attacks/code
+cd experiments/A7_privacy_attacks/code
 python exp_a7_privacy.py --variables HR Glucose --K 5
 ```
 
 **Q-mix pilot:**
 ```bash
-cd P7_qmix_pilot/code
+cd experiments/P7_qmix_pilot/code
 python run_qmix_pilot.py \
   --raw-ts-dir data_preparation/experiment_extracted/ts_48h \
   --variables HR Glucose \
   --alphas 1.0 2.0 3.0 \
   --secret-seed 42 \
-  --out-root P7_qmix_pilot/results
+  --out-root experiments/P7_qmix_pilot/results
 ```
 
 **End-to-end system (B4):**
 ```bash
-PYTHONPATH=agent_demo python B4_privacy_utility_tradeoff/code/exp_b4_timeline_icu_tasks.py --max-stays 500
+PYTHONPATH=agent_demo python experiments/B4_privacy_utility_tradeoff/code/exp_b4_timeline_icu_tasks.py --max-stays 500
 ```
 
 ---
@@ -204,7 +203,7 @@ Run the full attack suite (A: reconstruction, B: record linkage, C: membership i
 cd privacy_evaluation_protocol/code
 python run_privacy_protocol.py \
   --data-dir data_preparation/experiment_extracted/ts_48h \
-  --perturbed-dir A2_operator_grid/results/perturbed \
+  --perturbed-dir experiments/A2_operator_grid/results/perturbed \
   --out-dir privacy_evaluation_protocol/results \
   --attack A B C D \
   --variables HR Glucose \
